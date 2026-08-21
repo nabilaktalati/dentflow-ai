@@ -1,37 +1,45 @@
 import { createBrowserRouter } from 'react-router'
-import HomePage from '../pages/HomePage'
+
+import PublicLayout from '../layouts/PublicLayout.jsx'
+import HomePage from '../pages/HomePage.jsx'
+
 const router = createBrowserRouter([
   {
-  path: '/',
-  element: <HomePage />,
-},
-  {
-    path: '/services',
-    element: <div>Services</div>,
-  },
-  {
-    path: '/doctors',
-    element: <div>Doctors</div>,
-  },
-  {
-    path: '/ai-features',
-    element: <div>AI Features</div>,
-  },
-  {
-    path: '/about',
-    element: <div>About</div>,
-  },
-  {
-    path: '/contact',
-    element: <div>Contact</div>,
-  },
-  {
-    path: '/login',
-    element: <div>Login</div>,
-  },
-  {
-    path: '/register',
-    element: <div>Register</div>,
+    element: <PublicLayout />,
+    children: [
+      {
+        path: '/',
+        element: <HomePage />,
+      },
+      {
+        path: '/services',
+        element: <div className="px-8 pt-32">Hizmetler</div>,
+      },
+      {
+        path: '/doctors',
+        element: <div className="px-8 pt-32">Doktorlar</div>,
+      },
+      {
+        path: '/ai-features',
+        element: <div className="px-8 pt-32">AI Özellikler</div>,
+      },
+      {
+        path: '/about',
+        element: <div className="px-8 pt-32">Hakkımızda</div>,
+      },
+      {
+        path: '/contact',
+        element: <div className="px-8 pt-32">İletişim</div>,
+      },
+      {
+        path: '/login',
+        element: <div className="px-8 pt-32">Giriş</div>,
+      },
+      {
+        path: '/register',
+        element: <div className="px-8 pt-32">Randevu</div>,
+      },
+    ],
   },
 ])
 

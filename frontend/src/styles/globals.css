@@ -1,1 +1,91 @@
 @import "tailwindcss";
+
+@theme {
+  /* Typography */
+  --font-sans: "IBM Plex Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Manrope Variable", ui-sans-serif, system-ui, sans-serif;
+
+  /* DentFlow Brand */
+  --color-df-bg: #04101b;
+  --color-df-bg-soft: #07111d;
+  --color-df-surface: #0b1b2a;
+  --color-df-surface-soft: #102334;
+
+  --color-df-cyan: #22d3ee;
+  --color-df-cyan-soft: #67e8f9;
+  --color-df-sky: #38bdf8;
+  --color-df-blue: #3b82f6;
+
+  --color-df-text: #f8fafc;
+  --color-df-text-secondary: #94a3b8;
+  --color-df-text-muted: #64748b;
+
+  --color-df-border: #1e3347;
+
+  /* Semantic */
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-danger: #fb7185;
+
+  /* Radius */
+  --radius-df-sm: 8px;
+  --radius-df-md: 12px;
+  --radius-df-lg: 18px;
+  --radius-df-xl: 24px;
+}
+
+:root {
+  font-family: "IBM Plex Sans Variable", ui-sans-serif, system-ui, sans-serif;
+  color: #f8fafc;
+  background: #04101b;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  background: #04101b;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: #04101b;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background: rgba(34, 211, 238, 0.22);
+  color: #f8fafc;
+}
+
+:focus-visible {
+  outline: 2px solid #22d3ee;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
