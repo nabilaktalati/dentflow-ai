@@ -1,337 +1,157 @@
-import { useState } from 'react'
-import {
-    AnimatePresence,
-    motion,
-    useReducedMotion,
-} from 'motion/react'
-import {
-    ArrowDownRight,
-    ArrowUpRight,
-} from 'lucide-react'
+import { ArrowUpRight, BellRing, Clock3, ReceiptText, ShieldCheck } from 'lucide-react'
+import { Link } from 'react-router'
 
 import Container from '../../../components/ui/Container.jsx'
-import Button from '../../../components/ui/Button.jsx'
-import { patientFlow } from './heroData.js'
+import HeroVisual from './HeroVisual.jsx'
+
+const highlights = [
+  {
+    icon: ShieldCheck,
+    label: 'Güvenli Altyapı',
+  },
+  {
+    icon: Clock3,
+    label: 'Hızlı Klinik Akışı',
+  },
+  {
+    icon: ReceiptText,
+    label: 'Akıllı Faturalama',
+  },
+  {
+    icon: BellRing,
+    label: 'Otomatik Takip',
+  },
+]
 
 function Hero() {
-    const [activeStep, setActiveStep] = useState(0)
-    const reduceMotion = useReducedMotion()
+  return (
+    <section
+      id="home"
+      className="relative overflow-hidden bg-[#F8FAFD]"
+    >
+    
+      
+      <Container className="  relative z-10 pb-20 pt-32 sm:pt-36 lg:pb-24 lg:pt-40">
 
-    const currentStep = patientFlow[activeStep]
+        <div className="grid gap-14 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
 
-    const entrance = reduceMotion
-        ? {}
-        : {
-            initial: { opacity: 0, y: 20 },
-            animate: { opacity: 1, y: 0 },
-        }
+          {/* Left */}
+          <div>
 
-    return (
-        <section className="relative overflow-hidden bg-df-bg">
-            <Container className="relative flex min-h-[100svh] flex-col pb-10 pt-36 lg:pb-8 lg:pt-40">
+            {/* Eyebrow */}
+            <div className="flex items-center gap-4">
+              <span className="h-px w-14 bg-[#9BB4FF]" />
 
-                {/* Hero meta */}
-                <motion.div
-                    {...entrance}
-                    transition={{ duration: 0.45 }}
-                    className="flex items-center justify-between border-b border-df-border pb-5"
-                >
-                    <div className="flex items-center gap-3 text-xs text-df-text-muted">
-                        <span className="size-1.5 rounded-full bg-df-cyan" />
+              <span className="
+                text-[10px] font-semibold uppercase
+                tracking-[0.22em] text-[#4169E1]
+              ">
+                100% GÜVENLİ · HIZLI KURULUM · TEK PLATFORM
+              </span>
 
-                        Klinik yönetim sistemi
-                    </div>
+              <span className="hidden h-px w-14 bg-[#9BB4FF] sm:block" />
+            </div>
 
-                    <div className="hidden items-center gap-2 text-xs text-df-text-muted sm:flex">
-                        Hasta yolculuğu
-                        <ArrowDownRight className="size-3.5" />
-                    </div>
-                </motion.div>
+            {/* Headline */}
+            <h1 className="
+              mt-10
+              max-w-[720px]
+              font-display
+              text-[clamp(3rem,5.3vw,5rem)]
+              font-bold
+              leading-[1.02]
+              tracking-[-0.055em]
+              text-[#111827]
+            ">
+              Klinik Yönetimi.
 
-                {/* Main statement */}
-                <div className="flex flex-1 flex-col justify-center py-10 lg:py-8">
+              <span className="mt-4 block text-[#5956F5]">
+                Hızlı, Akıllı & Basit.
+              </span>
 
-                    <motion.p
-                        {...entrance}
-                        transition={{
-                            duration: 0.45,
-                            delay: reduceMotion ? 0 : 0.08,
-                        }}
-                        className="mb-6 text-xs font-semibold uppercase tracking-[0.3em] text-df-cyan"
-                    >
-                        DentFlow AI
-                    </motion.p>
+              <span className="mt-4 block">
+                Diş Klinikleri için.
+              </span>
+            </h1>
 
-                    <h1 className="max-w-[1200px] font-display text-[clamp(3rem,6.3vw,7.2rem)] font-semibold leading-[0.94] tracking-[-0.06em] text-df-text">
-                        <motion.span
-                            {...entrance}
-                            transition={{
-                                duration: 0.6,
-                                delay: reduceMotion ? 0 : 0.12,
-                            }}
-                            className="block"
-                        >
-                            Kliniğiniz sadece
-                        </motion.span>
+            <p className="
+              mt-8
+              max-w-[590px]
+              font-display
+              text-xl font-medium italic
+              text-[#4F5F75]
+            ">
+              Modern diş klinikleri için tasarlandı.
+            </p>
 
-                        <motion.span
-                            {...entrance}
-                            transition={{
-                                duration: 0.6,
-                                delay: reduceMotion ? 0 : 0.18,
-                            }}
-                            className="block text-df-text-secondary"
-                        >
-                            çalışmasın.
-                        </motion.span>
+            <p className="
+              mt-8 max-w-[610px]
+              text-[17px] leading-8
+              text-[#718096]
+            ">
+              DentFlow AI ile randevudan tedaviye, faturadan hasta
+              takibine kadar tüm klinik operasyonlarını tek bir sistem
+              üzerinden yönetin.
+            </p>
 
-                        <motion.span
-                            {...entrance}
-                            transition={{
-                                duration: 0.6,
-                                delay: reduceMotion ? 0 : 0.24,
-                            }}
-                            className="block"
-                        >
-                            Akıllı bir sistem gibi
-                            <span className="text-df-cyan">
-                                {' '}aksın.
-                            </span>
-                        </motion.span>
+            {/* CTA */}
+            <div className="mt-10">
 
-                    </h1>
+              <Link
+                to="/register"
+                className="
+                  inline-flex h-14 items-center gap-3
+                  rounded-[18px]
+                  bg-[#5956F5]
+                  px-8
+                  text-[15px] font-semibold text-white
+                  shadow-[0_14px_30px_rgba(89,86,245,0.24)]
+                  transition-all duration-200
+                  hover:-translate-y-0.5
+                  hover:bg-[#4B48E8]
+                "
+              >
+                Randevu Al
+                <ArrowUpRight className="size-4" />
+              </Link>
 
-                    <div className="mt-8 grid gap-8 lg:mt-10 lg:grid-cols-[1fr_430px] lg:items-end">
+            </div>
 
-                        <motion.div
-                            {...entrance}
-                            transition={{
-                                duration: 0.5,
-                                delay: reduceMotion ? 0 : 0.3,
-                            }}
-                            className="flex flex-wrap gap-3"
-                        >
-                            <Button
-                                to="/register"
-                                size="lg"
-                            >
-                                Randevu Al
-                                <ArrowUpRight className="size-4" />
-                            </Button>
+            {/* Highlights */}
+            <div className="
+              mt-10 flex flex-wrap
+              gap-x-6 gap-y-4
+            ">
+              {highlights.map((item) => {
+                const Icon = item.icon
 
-                            <Button
-                                to="/services"
-                                variant="secondary"
-                                size="lg"
-                            >
-                                Sistemi Keşfet
-                            </Button>
-                        </motion.div>
+                return (
+                  <div
+                    key={item.label}
+                    className="
+                      flex items-center gap-2
+                      text-xs font-medium
+                      text-[#56657A]
+                    "
+                  >
+                    <Icon className="size-4 text-[#4F6FFF]" />
+                    {item.label}
+                  </div>
+                )
+              })}
+            </div>
 
-                        <motion.p
-                            {...entrance}
-                            transition={{
-                                duration: 0.5,
-                                delay: reduceMotion ? 0 : 0.34,
-                            }}
-                            className="max-w-md text-base leading-7 text-df-text-secondary lg:justify-self-end"
-                        >
-                            Randevudan tedaviye, faturadan otomatik takibe kadar
-                            kliniğinizdeki tüm hasta sürecini tek bir akış içinde yönetin.
-                        </motion.p>
+          </div>
 
-                    </div>
+          {/* Right */}
+          <HeroVisual />
 
-                    {/* Dynamic workflow readout */}
-                    <div className="mt-8 flex justify-start lg:justify-end">
+        </div>
 
-                       <div
-  className="w-full border-l border-df-cyan pl-5 sm:max-w-xl lg:max-w-[520px]"
-  aria-live="polite"
-  aria-atomic="true"
->
-
-                            <div className="mb-3 flex items-center justify-between gap-4">
-                                <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-df-cyan">
-                                    Aktif Akış / {currentStep.id}
-                                </span>
-
-                                <span className="text-[11px] text-df-text-muted">
-                                    {currentStep.status}
-                                </span>
-                            </div>
-
-                            <AnimatePresence mode="wait">
-                                <motion.div
-                                    key={currentStep.id}
-                                    initial={
-                                        reduceMotion
-                                            ? false
-                                            : { opacity: 0, y: 8 }
-                                    }
-                                    animate={{
-                                        opacity: 1,
-                                        y: 0,
-                                    }}
-                                    exit={
-                                        reduceMotion
-                                            ? undefined
-                                            : { opacity: 0, y: -6 }
-                                    }
-                                    transition={{ duration: 0.22 }}
-                                >
-                                    <div className="font-display text-xl font-medium tracking-[-0.03em] text-df-text">
-                                        {currentStep.label}
-                                    </div>
-                                    <div className="mt-3 inline-flex items-center gap-2 text-xs text-df-text-secondary">
-                                        <span className="size-1.5 rounded-full bg-success" />
-                                        {currentStep.signal}
-                                    </div>
-                                    <p className="mt-2 max-w-lg text-sm leading-6 text-df-text-secondary">
-                                        {currentStep.detail}
-                                    </p>
-                                </motion.div>
-                            </AnimatePresence>
-
-                        </div>
-
-                    </div>
-                </div>
-
-                {/* Patient Flow Theatre */}
-                <div className="relative border-t border-df-border">
-
-                    <div className="grid lg:grid-cols-5">
-                        {patientFlow.map((step, index) => {
-                            const isActive = activeStep === index
-
-                            return (
-                                <motion.button
-                                    key={step.id}
-                                    type="button"
-                                    aria-pressed={isActive}
-                                    onMouseEnter={() => setActiveStep(index)}
-                                    onFocus={() => setActiveStep(index)}
-                                    onClick={() => setActiveStep(index)}
-                                    initial={
-                                        reduceMotion
-                                            ? false
-                                            : { opacity: 0, y: 12 }
-                                    }
-                                    animate={{
-                                        opacity: 1,
-                                        y: 0,
-                                    }}
-                                    transition={{
-                                        duration: 0.35,
-                                        delay: reduceMotion ? 0 : 0.05 * index,
-                                    }}
-                                    className={`
-                    group relative min-h-20
-                    border-b border-df-border
-                    px-0 py-5 text-left
-                    transition-colors duration-200
-                    lg:min-h-32 lg:border-b-0 lg:px-5
-                    ${index !== 0 ? 'lg:border-l' : ''}
-                  `}
-                                >
-                                    {isActive && (
-                                        <motion.span
-                                            layoutId="patient-flow-active"
-                                            className="absolute inset-x-0 top-0 h-px bg-df-cyan"
-                                            transition={{
-                                                type: 'spring',
-                                                stiffness: 420,
-                                                damping: 35,
-                                            }}
-                                        />
-                                    )}
-
-                                    <div className="flex items-start justify-between lg:block">
-
-                                        <span
-                                            className={`
-                        text-[10px] font-medium tracking-[0.18em]
-                        transition-colors
-                        ${isActive
-                                                    ? 'text-df-cyan'
-                                                    : 'text-df-text-muted'
-                                                }
-                      `}
-                                        >
-                                            {step.id}
-                                        </span>
-
-                                        <div className="lg:mt-8">
-                                            <div
-                                                className={`
-                          font-display text-xl font-medium
-                          tracking-[-0.03em]
-                          transition-colors
-                          ${isActive
-                                                        ? 'text-df-text'
-                                                        : 'text-df-text-secondary'
-                                                    }
-                        `}
-                                            >
-                                                {step.label}
-                                            </div>
-
-                                            <p className="mt-1 text-sm text-df-text-muted">
-                                                {step.description}
-                                            </p>
-                                            <span
-  className={`
-    mt-4 inline-flex items-center gap-2
-    text-[11px]
-    transition-colors
-    ${
-      isActive
-        ? 'text-df-text-secondary'
-        : 'text-df-text-muted'
-    }
-  `}
->
-  <span
-    className={`
-      size-1 rounded-full
-      ${
-        isActive
-          ? 'bg-success'
-          : 'bg-df-border'
-      }
-    `}
-  />
-
-  {step.signal}
-</span>
-                                        </div>
-
-                                    </div>
-
-                                    {index < patientFlow.length - 1 && (
-                                        <span
-                                            className={`
-                        absolute -right-[3px] top-1/2
-                        hidden size-1.5 -translate-y-1/2
-                        rounded-full lg:block
-                        ${isActive
-                                                    ? 'bg-df-cyan'
-                                                    : 'bg-df-border'
-                                                }
-                      `}
-                                        />
-                                    )}
-                                </motion.button>
-                            )
-                        })}
-                    </div>
-
-                </div>
-
-            </Container>
-        </section>
-    )
+      </Container>
+    </section>
+    
+  )
 }
 
 export default Hero

@@ -1,7 +1,14 @@
 function LogoMark({ className = '' }) {
   return (
     <div
-      className={`flex size-9 items-center justify-center rounded-df-md border border-df-border bg-df-surface ${className}`}
+      className={`
+        flex size-9 items-center justify-center
+        rounded-xl
+        border border-[#E5E7F0]
+        bg-[#F3F1FF]
+        text-[#5956F5]
+        ${className}
+      `}
       aria-hidden="true"
     >
       <svg

@@ -1,13 +1,20 @@
 import { Outlet } from 'react-router'
-
 import Navbar from '../components/navigation/Navbar.jsx'
+import BackToTopButton from '../components/ui/BackToTopButton.jsx'
+import Footer from '../components/footer/Footer.jsx'
 
 function PublicLayout() {
   return (
-    <div className="min-h-screen bg-df-bg text-df-text">
+    <div className="min-h-screen bg-[#F8FAFD] text-[#111827]">
       <Navbar />
 
-      <Outlet />
+      <main>
+        <Outlet />
+      </main>
+
+      <Footer />
+
+      <BackToTopButton />
     </div>
   )
 }

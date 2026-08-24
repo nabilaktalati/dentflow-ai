@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
-
+import contactRoutes from './routes/contact.routes.js'
 import healthRoutes from './routes/healthRoutes.js'
 import { errorHandler, notFound } from './middleware/errorMiddleware.js'
 
@@ -27,7 +27,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 app.use('/api/health', healthRoutes)
-
+app.use('/api/contact', contactRoutes)
 app.use(notFound)
 app.use(errorHandler)
 
