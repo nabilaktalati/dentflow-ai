@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 import User from '../models/User.js'
 import PatientProfile from '../models/PatientProfile.js'
 import EmailVerification from '../models/EmailVerification.js'
-
+import { normalizeTurkishMobilePhone } from '../services/phoneService.js'
 import { USER_ROLES } from '../constants/roles.js'
 import {
   registerSchema,
@@ -45,6 +45,16 @@ export const registerPatient = async (req, res, next) => {
       password,
     } = validationResult.data
 
+    let normalizedPhone
+
+try {
+  normalizedPhone = normalizeTurkishMobilePhone(phone)
+} catch (phoneError) {
+  return res.status(400).json({
+    success: false,
+    message: phoneError.message,
+  })
+}
     // 2. Check existing account
     const existingUser = await User.findOne({ email }).lean()
 
@@ -54,7 +64,17 @@ export const registerPatient = async (req, res, next) => {
         message: 'Bu e-posta adresiyle kayıtlı bir hesap bulunmaktadır.',
       })
     }
+const existingPhone = await PatientProfile.findOne({
+  phone: normalizedPhone,
+}).lean()
 
+if (existingPhone) {
+  return res.status(409).json({
+    success: false,
+    message:
+      'Bu telefon numarası başka bir hasta hesabında kullanılmaktadır.',
+  })
+}
     // 3. Hash password
     const passwordHash = await hashPassword(password)
 
@@ -94,7 +114,7 @@ export const registerPatient = async (req, res, next) => {
             user: createdUser._id,
             firstName,
             lastName,
-            phone,
+            phone: normalizedPhone,
           },
         ],
         { session },

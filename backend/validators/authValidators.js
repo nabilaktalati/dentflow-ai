@@ -31,12 +31,11 @@ export const registerSchema = z.object({
 
   email: emailSchema,
 
-  phone: z
-    .string()
-    .trim()
-    .max(30, 'Telefon numarası çok uzun.')
-    .optional()
-    .default(''),
+phone: z
+  .string()
+  .trim()
+  .min(1, 'Telefon numarası zorunludur.')
+  .max(30, 'Telefon numarası çok uzun.'),
 
   password: passwordSchema,
 })

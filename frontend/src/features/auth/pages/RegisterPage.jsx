@@ -812,17 +812,20 @@ function RegisterContent({
           placeholder="ornek@email.com"
           icon={Mail}
           onChange={onChange}
+          autoComplete="email"
           required
         />
 
         <Field
-          label="Telefon"
-          name="phone"
-          type="tel"
-          value={form.phone}
-          placeholder="05XX XXX XX XX"
-          onChange={onChange}
-        />
+  label="Telefon"
+  name="phone"
+  type="tel"
+  value={form.phone}
+  placeholder="05XX XXX XX XX"
+  autoComplete="tel"
+  inputMode="tel"
+  onChange={onChange}
+/>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <PasswordField
@@ -854,25 +857,39 @@ function RegisterContent({
           />
         </div>
 
-        <p className="text-xs leading-5 text-slate-400">
-          Şifreniz en az 8 karakter,
-          bir büyük harf, bir küçük
-          harf ve bir rakam
-          içermelidir.
-        </p>
+        <div className="min-h-[42px]">
+  {error ? (
+    <motion.div
+      initial={{
+        opacity: 0,
+        y: -5,
+      }}
+      animate={{
+        opacity: 1,
+        y: 0,
+      }}
+      transition={{
+        duration: 0.25,
+      }}
+    >
+      <Alert type="error">
+        {error}
+      </Alert>
+    </motion.div>
+  ) : (
+    <p className="pt-1 text-xs leading-5 text-slate-400">
+      Şifreniz en az 8 karakter, bir büyük harf,
+      bir küçük harf ve bir rakam içermelidir.
+    </p>
+  )}
+</div>
 
-        {error && (
-          <Alert type="error">
-            {error}
-          </Alert>
-        )}
-
-        <PrimaryButton
-          loading={loading}
-          loadingText="Hesap oluşturuluyor..."
-        >
-          Hesap Oluştur
-        </PrimaryButton>
+<PrimaryButton
+  loading={loading}
+  loadingText="Hesap oluşturuluyor..."
+>
+  Hesap Oluştur
+</PrimaryButton>
       </form>
 
       <p className="mt-5 text-center text-sm text-slate-500">
@@ -1392,7 +1409,7 @@ function Alert({
   return (
     <div
       role="alert"
-      className={`rounded-xl border px-4 py-3 text-sm leading-5 ${
+     className={`rounded-xl border px-4 py-2.5 text-sm leading-5 ${
         success
           ? 'border-emerald-100 bg-emerald-50 text-emerald-700'
           : 'border-red-100 bg-red-50 text-red-700'

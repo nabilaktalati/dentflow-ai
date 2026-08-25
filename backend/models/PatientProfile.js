@@ -29,8 +29,8 @@ const patientProfileSchema = new mongoose.Schema(
     phone: {
       type: String,
       trim: true,
-      maxlength: 25,
-      default: '',
+      maxlength: 20,
+      default: null,
     },
 
     dateOfBirth: {
@@ -41,6 +41,27 @@ const patientProfileSchema = new mongoose.Schema(
   {
     timestamps: true,
     versionKey: false,
+  },
+)
+
+/*
+ * Aynı telefon numarası birden fazla hasta hesabında
+ * kullanılamaz.
+ *
+ * null veya boş telefon kayıtları unique index'e
+ * dahil edilmez.
+ */
+patientProfileSchema.index(
+  { phone: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      phone: {
+        $type: 'string',
+        $gt: '',
+      },
+    },
+    name: 'unique_patient_phone',
   },
 )
 

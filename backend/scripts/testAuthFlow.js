@@ -14,14 +14,30 @@ import {
   comparePassword,
 } from '../services/passwordService.js'
 
-const API_URL = `http://localhost:${process.env.PORT || 5000}/api/auth`
+const API_URL =
+  `http://localhost:${process.env.PORT || 5000}/api/auth`
 
 const TEST_PASSWORD = 'DentFlow123'
 const KNOWN_OTP = '654321'
 const WRONG_OTP = '000000'
 
+/*
+ * Her test çalıştırıldığında yeni bir Türkiye
+ * cep telefonu numarası üretilir.
+ *
+ * Örnek:
+ * 05XXXXXXXXX
+ */
+const TEST_PHONE =
+  `05${String(Date.now()).slice(-9)}`
+
+const NORMALIZED_TEST_PHONE =
+  `+90${TEST_PHONE.slice(1)}`
+
 let testUserId = null
 let testEmail = null
+
+const testEmails = []
 
 const assert = (condition, message) => {
   if (!condition) {
@@ -29,7 +45,7 @@ const assert = (condition, message) => {
   }
 }
 
-const createTestEmail = () => {
+const createTestEmail = (label = 'main') => {
   const smtpEmail = process.env.SMTP_USER
 
   if (!smtpEmail?.includes('@')) {
@@ -46,17 +62,23 @@ const createTestEmail = () => {
     )
   }
 
-  return `${name}+day6-${Date.now()}@${domain}`
+  return (
+    `${name}+day6-${label}-${Date.now()}-` +
+    `${Math.floor(Math.random() * 100000)}@${domain}`
+  )
 }
 
 const request = async (endpoint, body) => {
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
+  const response = await fetch(
+    `${API_URL}${endpoint}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
     },
-    body: JSON.stringify(body),
-  })
+  )
 
   const data = await response.json()
 
@@ -67,29 +89,57 @@ const request = async (endpoint, body) => {
 }
 
 const cleanup = async () => {
-  if (!testUserId) return
+  if (testEmails.length === 0) {
+    return
+  }
+
+  const users = await User.find({
+    email: {
+      $in: testEmails,
+    },
+  }).select('_id')
+
+  if (users.length === 0) {
+    return
+  }
+
+  const userIds = users.map(
+    (user) => user._id,
+  )
 
   await EmailVerification.deleteMany({
-    user: testUserId,
+    user: {
+      $in: userIds,
+    },
   })
 
   await PatientProfile.deleteMany({
-    user: testUserId,
+    user: {
+      $in: userIds,
+    },
   })
 
-  await User.deleteOne({
-    _id: testUserId,
+  await User.deleteMany({
+    _id: {
+      $in: userIds,
+    },
   })
 }
 
 const run = async () => {
   try {
-    console.log('\nDentFlow AI - Day 6 Auth Testleri')
-    console.log('=================================\n')
+    console.log(
+      '\nDentFlow AI - Day 6 Auth Testleri',
+    )
+
+    console.log(
+      '=================================\n',
+    )
 
     await connectDB()
 
-    testEmail = createTestEmail()
+    testEmail = createTestEmail('main')
+    testEmails.push(testEmail)
 
     // 1. REGISTER
     const registerResponse = await request(
@@ -98,7 +148,7 @@ const run = async () => {
         firstName: 'Auth',
         lastName: 'Test',
         email: testEmail,
-        phone: '05551234567',
+        phone: TEST_PHONE,
         password: TEST_PASSWORD,
       },
     )
@@ -117,7 +167,10 @@ const run = async () => {
       email: testEmail,
     }).select('+passwordHash')
 
-    assert(user, 'Test kullanıcısı bulunamadı.')
+    assert(
+      user,
+      'Test kullanıcısı bulunamadı.',
+    )
 
     testUserId = user._id
 
@@ -150,7 +203,18 @@ const run = async () => {
       '✅ User + PatientProfile oluşturma testi başarılı.',
     )
 
-    // 3. PASSWORD HASH
+    // 3. PHONE NORMALIZATION
+    assert(
+      patientProfile.phone ===
+        NORMALIZED_TEST_PHONE,
+      `Telefon normalize edilmedi. Kaydedilen: ${patientProfile.phone}`,
+    )
+
+    console.log(
+      `✅ Telefon normalizasyon testi başarılı: ${patientProfile.phone}`,
+    )
+
+    // 4. PASSWORD HASH
     assert(
       user.passwordHash !== TEST_PASSWORD,
       'Şifre düz metin olarak saklanıyor.',
@@ -171,7 +235,7 @@ const run = async () => {
       '✅ bcrypt parola hash testi başarılı.',
     )
 
-    // 4. OTP RECORD
+    // 5. OTP RECORD
     let verification =
       await EmailVerification.findOne({
         user: user._id,
@@ -191,14 +255,14 @@ const run = async () => {
       '✅ OTP hash ve doğrulama kaydı testi başarılı.',
     )
 
-    // 5. DUPLICATE EMAIL
+    // 6. DUPLICATE EMAIL
     const duplicateResponse = await request(
       '/register',
       {
         firstName: 'Duplicate',
-        lastName: 'Test',
+        lastName: 'Email',
         email: testEmail,
-        phone: '05550000000',
+        phone: '05441112233',
         password: TEST_PASSWORD,
       },
     )
@@ -212,7 +276,78 @@ const run = async () => {
       '✅ Duplicate e-posta engelleme testi başarılı.',
     )
 
-    // 6. RESEND COOLDOWN
+    // 7. DUPLICATE PHONE
+    const duplicatePhoneEmail =
+      createTestEmail('phone')
+
+    testEmails.push(
+      duplicatePhoneEmail,
+    )
+
+    const duplicatePhoneResponse =
+      await request(
+        '/register',
+        {
+          firstName: 'Duplicate',
+          lastName: 'Phone',
+          email: duplicatePhoneEmail,
+
+          /*
+           * İlk kayıt 05... formatındaydı.
+           * Burada aynı numara +90 formatıyla
+           * gönderiliyor.
+           */
+          phone: NORMALIZED_TEST_PHONE,
+
+          password: TEST_PASSWORD,
+        },
+      )
+
+    assert(
+      duplicatePhoneResponse.status === 409,
+      'Aynı telefon numarası ikinci hesapta kullanılabildi.',
+    )
+
+    assert(
+      duplicatePhoneResponse.data?.message
+        ?.includes('telefon numarası'),
+      'Duplicate telefon hata mesajı beklenen formatta değil.',
+    )
+
+    console.log(
+      '✅ Duplicate telefon numarası engelleme testi başarılı.',
+    )
+
+    // 8. INVALID PHONE
+    const invalidPhoneEmail =
+      createTestEmail('invalid-phone')
+
+    testEmails.push(
+      invalidPhoneEmail,
+    )
+
+    const invalidPhoneResponse =
+      await request(
+        '/register',
+        {
+          firstName: 'Invalid',
+          lastName: 'Phone',
+          email: invalidPhoneEmail,
+          phone: '12345',
+          password: TEST_PASSWORD,
+        },
+      )
+
+    assert(
+      invalidPhoneResponse.status === 400,
+      'Geçersiz telefon numarası reddedilmedi.',
+    )
+
+    console.log(
+      '✅ Geçersiz telefon numarası doğrulama testi başarılı.',
+    )
+
+    // 9. RESEND COOLDOWN
     const cooldownResponse = await request(
       '/resend-verification',
       {
@@ -229,7 +364,7 @@ const run = async () => {
       '✅ 60 saniyelik resend cooldown testi başarılı.',
     )
 
-    // 7. WRONG OTP
+    // 10. WRONG OTP
     verification.codeHash =
       hashOtpCode(KNOWN_OTP)
 
@@ -263,7 +398,7 @@ const run = async () => {
       '✅ Yanlış OTP ve kalan deneme testi başarılı.',
     )
 
-    // 8. MAX ATTEMPTS
+    // 11. MAX ATTEMPTS
     await EmailVerification.updateOne(
       {
         user: user._id,
@@ -276,10 +411,13 @@ const run = async () => {
     )
 
     const maxAttemptsResponse =
-      await request('/verify-email', {
-        email: testEmail,
-        code: WRONG_OTP,
-      })
+      await request(
+        '/verify-email',
+        {
+          email: testEmail,
+          code: WRONG_OTP,
+        },
+      )
 
     assert(
       maxAttemptsResponse.status === 429,
@@ -290,7 +428,7 @@ const run = async () => {
       '✅ Maksimum OTP deneme sınırı testi başarılı.',
     )
 
-    // 9. RESEND AFTER COOLDOWN
+    // 12. RESEND AFTER COOLDOWN
     await EmailVerification.updateOne(
       {
         user: user._id,
@@ -330,12 +468,14 @@ const run = async () => {
       '✅ OTP yeniden gönderme ve sayaç sıfırlama testi başarılı.',
     )
 
-    // 10. EXPIRED OTP
+    // 13. EXPIRED OTP
     verification.codeHash =
       hashOtpCode(KNOWN_OTP)
 
     verification.expiresAt =
-      new Date(Date.now() - 60000)
+      new Date(
+        Date.now() - 60000,
+      )
 
     await verification.save()
 
@@ -356,17 +496,20 @@ const run = async () => {
       '✅ Süresi dolmuş OTP testi başarılı.',
     )
 
-    // 11. CREATE FRESH TEST OTP
+    // 14. CREATE FRESH TEST OTP
     await EmailVerification.create({
       user: user._id,
-      codeHash: hashOtpCode(KNOWN_OTP),
-      expiresAt: getOtpExpiryDate(),
+      codeHash: hashOtpCode(
+        KNOWN_OTP,
+      ),
+      expiresAt:
+        getOtpExpiryDate(),
       attempts: 0,
       maxAttempts: 5,
       lastSentAt: new Date(),
     })
 
-    // 12. SUCCESSFUL VERIFICATION
+    // 15. SUCCESSFUL VERIFICATION
     const verifyResponse = await request(
       '/verify-email',
       {
@@ -381,7 +524,9 @@ const run = async () => {
     )
 
     const verifiedUser =
-      await User.findById(user._id)
+      await User.findById(
+        user._id,
+      )
 
     assert(
       verifiedUser.isEmailVerified === true,
@@ -397,7 +542,7 @@ const run = async () => {
       '✅ E-posta doğrulama ve hesap aktivasyonu testi başarılı.',
     )
 
-    // 13. OTP MUST BE REMOVED
+    // 16. OTP MUST BE REMOVED
     const remainingVerification =
       await EmailVerification.findOne({
         user: user._id,
@@ -412,17 +557,20 @@ const run = async () => {
       '✅ Kullanılmış OTP kaydının silinmesi testi başarılı.',
     )
 
-    // 14. ALREADY VERIFIED
+    // 17. ALREADY VERIFIED
     const alreadyVerifiedResponse =
-      await request('/verify-email', {
-        email: testEmail,
-        code: WRONG_OTP,
-      })
+      await request(
+        '/verify-email',
+        {
+          email: testEmail,
+          code: WRONG_OTP,
+        },
+      )
 
     assert(
       alreadyVerifiedResponse.status === 200 &&
-        alreadyVerifiedResponse.data?.data
-          ?.verified === true,
+        alreadyVerifiedResponse.data
+          ?.data?.verified === true,
       'Already verified kontrolü başarısız.',
     )
 
@@ -437,7 +585,11 @@ const run = async () => {
     console.error(
       '\n❌ DAY 6 AUTH TEST BAŞARISIZ',
     )
-    console.error(error.message)
+
+    console.error(
+      error.message,
+    )
+
     process.exitCode = 1
   } finally {
     try {
