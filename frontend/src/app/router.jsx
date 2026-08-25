@@ -9,6 +9,7 @@ import AboutPage from "../features/about/pages/AboutPage.jsx";
 import ContactPage from "../features/contact/pages/ContactPage.jsx";
 import PrivacyPage from '../features/legal/pages/PrivacyPage.jsx'
 import TermsPage from '../features/legal/pages/TermsPage.jsx'
+import RegisterPage from "../features/auth/pages/RegisterPage.jsx";
 const router = createBrowserRouter([
   // PUBLIC WEBSITE
   {
@@ -38,14 +39,14 @@ const router = createBrowserRouter([
         path: "contact",
         element: <ContactPage />,
       },
-      {
-        path: "login",
-        element: <div className="px-8 pt-32">Giriş</div>,
-      },
-      {
-        path: "register",
-        element: <div className="px-8 pt-32">Kayıt</div>,
-      },
+{
+  path: "login",
+  element: <div className="px-8 pt-32">Giriş</div>,
+},
+{
+  path: "register",
+  element: <RegisterPage />,
+},
       {
   path: 'privacy',
   element: <PrivacyPage />,

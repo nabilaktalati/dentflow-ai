@@ -196,10 +196,7 @@ async function runDatabaseTest() {
         {
           status: APPOINTMENT_STATUSES.COMPLETED,
         },
-        {
-          new: true,
-          runValidators: true,
-        },
+        { returnDocument: 'after' }
       )
 
     if (

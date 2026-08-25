@@ -2,9 +2,15 @@ import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
+
 import contactRoutes from './routes/contact.routes.js'
 import healthRoutes from './routes/healthRoutes.js'
-import { errorHandler, notFound } from './middleware/errorMiddleware.js'
+import authRoutes from './routes/authRoutes.js'
+
+import {
+  errorHandler,
+  notFound,
+} from './middleware/errorMiddleware.js'
 
 const app = express()
 
@@ -28,6 +34,8 @@ if (process.env.NODE_ENV !== 'production') {
 
 app.use('/api/health', healthRoutes)
 app.use('/api/contact', contactRoutes)
+app.use('/api/auth', authRoutes)
+
 app.use(notFound)
 app.use(errorHandler)
 
