@@ -8,7 +8,8 @@
   "start": "node server.js",
   "test:db": "node scripts/testDatabase.js",
   "test:db-validation": "node scripts/testDatabaseValidation.js",
-  "test:auth": "node scripts/testAuthFlow.js"
+  "test:auth": "node scripts/testAuthFlow.js",
+  "clear:users": "node scripts/clearAllUsers.js"
 },
   "keywords": [],
   "author": "",

@@ -71,22 +71,21 @@ function HeroVisual() {
 
   const activeNode = flowNodes[activeIndex]
 
-  return (
-    <div className="relative mx-auto w-full max-w-[570px]">
+return (
+  <div className="relative mx-auto w-full max-w-[570px]">
+    <div className="pointer-events-none absolute inset-0 translate-y-8 rounded-[42px] bg-[#655CF6]/10 blur-[70px]" />
 
-      <div className="pointer-events-none absolute inset-0 translate-y-8 rounded-[42px] bg-[#655CF6]/10 blur-[70px]" />
-
-      <div
-        className="
-          relative overflow-hidden
-          rounded-[34px]
-          border border-[#E7E8F5]
-          bg-white
-          p-5
-          shadow-[0_30px_80px_rgba(58,67,110,0.12)]
-          sm:p-6
-        "
-      >
+    <div
+      className="
+        relative overflow-hidden
+        rounded-[34px]
+        border border-[#E7E8F5]
+        bg-white
+        p-5
+        shadow-[0_30px_80px_rgba(58,67,110,0.12)]
+        sm:p-6
+      "
+    >
 
         {/* Header */}
         <div className="flex items-center justify-between gap-4">
@@ -357,7 +356,6 @@ function HeroVisual() {
           >
             <CreditCard className="size-5" />
           </div>
-
         </div>
 
       </div>
