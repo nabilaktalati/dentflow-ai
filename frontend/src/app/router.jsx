@@ -10,6 +10,7 @@ import ContactPage from "../features/contact/pages/ContactPage.jsx";
 import PrivacyPage from '../features/legal/pages/PrivacyPage.jsx'
 import TermsPage from '../features/legal/pages/TermsPage.jsx'
 import RegisterPage from "../features/auth/pages/RegisterPage.jsx";
+import LoginPage from '../features/auth/pages/LoginPage.jsx'
 const router = createBrowserRouter([
   // PUBLIC WEBSITE
   {
@@ -40,8 +41,8 @@ const router = createBrowserRouter([
         element: <ContactPage />,
       },
 {
-  path: "login",
-  element: <div className="px-8 pt-32">Giriş</div>,
+  path: '/login',
+  element: <LoginPage />,
 },
 {
   path: "register",

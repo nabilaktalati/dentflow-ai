@@ -52,3 +52,19 @@ export const verifyEmailSchema = z.object({
 export const resendVerificationSchema = z.object({
   email: emailSchema,
 })
+export const loginSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email(
+      'Geçerli bir e-posta adresi giriniz.',
+    ),
+
+  password: z
+    .string()
+    .min(
+      1,
+      'Şifre zorunludur.',
+    ),
+})

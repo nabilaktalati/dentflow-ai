@@ -5,9 +5,18 @@ import router from './app/router.jsx'
 import './styles/globals.css'
 import '@fontsource-variable/ibm-plex-sans'
 import '@fontsource-variable/manrope'
+import {
+  AuthProvider,
+} from './features/auth/context/AuthContext.jsx'
+
+
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <RouterProvider router={router} />
-  </StrictMode>,
+<StrictMode>
+  <AuthProvider>
+    <RouterProvider
+      router={router}
+    />
+  </AuthProvider>
+</StrictMode>
 )

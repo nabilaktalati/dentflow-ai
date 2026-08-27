@@ -4,7 +4,13 @@ import { connectDB, disconnectDB } from '../config/db.js'
 import User from '../models/User.js'
 import PatientProfile from '../models/PatientProfile.js'
 import EmailVerification from '../models/EmailVerification.js'
+import {
+  createSession,
+} from '../services/sessionService.js'
 
+import {
+  setAuthCookies,
+} from '../services/cookieService.js'
 import { USER_ROLES } from '../constants/roles.js'
 import {
   hashOtpCode,
@@ -125,7 +131,146 @@ const cleanup = async () => {
     },
   })
 }
+export const login = async (
+  req,
+  res,
+  next,
+) => {
+  try {
+    const validationResult =
+      loginSchema.safeParse(
+        req.body,
+      )
 
+    if (!validationResult.success) {
+      return res.status(400).json({
+        success: false,
+        message:
+          'Giriş bilgileri geçersiz.',
+        errors:
+          validationResult.error.flatten()
+            .fieldErrors,
+      })
+    }
+
+    const {
+      email,
+      password,
+    } = validationResult.data
+
+    const user =
+      await User.findOne({
+        email,
+      }).select('+passwordHash')
+
+    /*
+     * Kullanıcı bulunamazsa veya parola
+     * yanlışsa aynı mesaj döndürülür.
+     *
+     * Böylece sistemde kayıtlı e-posta
+     * adresleri dışarıya açıklanmaz.
+     */
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message:
+          'E-posta veya şifre hatalı.',
+      })
+    }
+
+    const passwordMatches =
+      await comparePassword(
+        password,
+        user.passwordHash,
+      )
+
+    if (!passwordMatches) {
+      return res.status(401).json({
+        success: false,
+        message:
+          'E-posta veya şifre hatalı.',
+      })
+    }
+
+    /*
+     * Parola doğru olsa bile e-posta
+     * doğrulanmamış hesap giriş yapamaz.
+     */
+    if (!user.isEmailVerified) {
+      return res.status(403).json({
+        success: false,
+        message:
+          'Giriş yapmadan önce e-posta adresinizi doğrulayın.',
+        data: {
+          requiresEmailVerification: true,
+        },
+      })
+    }
+
+    /*
+     * Yalnızca aktif hesaplar sisteme
+     * giriş yapabilir.
+     */
+    if (user.status !== 'ACTIVE') {
+      return res.status(403).json({
+        success: false,
+        message:
+          'Hesabınız şu anda aktif değil.',
+      })
+    }
+
+    /*
+     * Yeni bir güvenli oturum oluşturulur.
+     */
+    const session =
+      await createSession({
+        userId: user._id,
+        role: user.role,
+
+        userAgent:
+          req.get('user-agent') || '',
+
+        ipAddress:
+          req.ip || '',
+      })
+
+    /*
+     * Tokenlar response body içinde
+     * gönderilmez.
+     *
+     * HttpOnly cookie olarak saklanır.
+     */
+    setAuthCookies(
+      res,
+      {
+        accessToken:
+          session.accessToken,
+
+        refreshToken:
+          session.refreshToken,
+      },
+    )
+
+    return res.status(200).json({
+      success: true,
+      message:
+        'Giriş başarılı.',
+
+      data: {
+        user: {
+          id: user._id,
+          email: user.email,
+          role: user.role,
+          status: user.status,
+          isEmailVerified:
+            user.isEmailVerified,
+        },
+      },
+    })
+  } catch (error) {
+    next(error)
+  }
+}
 const run = async () => {
   try {
     console.log(

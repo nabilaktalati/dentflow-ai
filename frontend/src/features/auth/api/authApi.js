@@ -1,23 +1,85 @@
-const API_BASE_URL = '/api/auth'
+const request = async (
+  url,
+  options = {},
+) => {
+  let response
 
-const request = async (endpoint, options = {}) => {
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-    ...options,
-  })
+  try {
+    response = await fetch(url, {
+      ...options,
 
-  const data = await response.json()
+      credentials: 'include',
+
+      cache: 'no-store',
+
+      headers: {
+        'Content-Type':
+          'application/json',
+
+        ...options.headers,
+      },
+    })
+  } catch {
+    const error = new Error(
+      'Sunucuya ulaşılamadı. Lütfen tekrar deneyin.',
+    )
+
+    error.status = 0
+    error.data = null
+
+    throw error
+  }
+
+  const responseText =
+    await response.text()
+
+let data = {}
+let hasValidJson = false
+
+if (responseText) {
+  try {
+    data = JSON.parse(
+      responseText,
+    )
+
+    hasValidJson = true
+  } catch {
+    data = {}
+  }
+}
+
+if (!response.ok) {
+  const serverUnavailable =
+    response.status >= 500 &&
+    !hasValidJson
+
+  const error = new Error(
+    serverUnavailable
+      ? 'Sunucuya ulaşılamadı. Lütfen tekrar deneyin.'
+      : data.message ||
+          'İşlem sırasında bir hata oluştu. Lütfen tekrar deneyin.',
+  )
+
+  error.status =
+    response.status
+
+  error.data =
+    data
+
+  throw error
+}
 
   if (!response.ok) {
     const error = new Error(
-      data.message || 'İşlem sırasında bir hata oluştu.',
+      data.message ||
+        'İşlem sırasında bir hata oluştu. Lütfen tekrar deneyin.',
     )
 
-    error.status = response.status
-    error.data = data
+    error.status =
+      response.status
+
+    error.data =
+      data
 
     throw error
   }
@@ -25,28 +87,89 @@ const request = async (endpoint, options = {}) => {
   return data
 }
 
-export const registerPatient = async (formData) => {
-  return request('/register', {
-    method: 'POST',
-    body: JSON.stringify(formData),
-  })
-}
+// ========================================
+// REGISTER
+// ========================================
 
-export const verifyEmail = async ({ email, code }) => {
-  return request('/verify-email', {
+export const registerPatient = (
+  payload,
+) =>
+  request('/api/auth/register', {
     method: 'POST',
-    body: JSON.stringify({
-      email,
-      code,
-    }),
+    body: JSON.stringify(payload),
   })
-}
 
-export const resendVerification = async (email) => {
-  return request('/resend-verification', {
+
+// ========================================
+// EMAIL VERIFICATION
+// ========================================
+
+export const verifyEmail = (
+  payload,
+) =>
+  request(
+    '/api/auth/verify-email',
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    },
+  )
+
+
+// ========================================
+// RESEND VERIFICATION
+// ========================================
+
+export const resendVerification = (
+  payload,
+) =>
+  request(
+    '/api/auth/resend-verification',
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    },
+  )
+
+
+// ========================================
+// LOGIN
+// ========================================
+
+export const loginUser = (
+  payload,
+) =>
+  request('/api/auth/login', {
     method: 'POST',
-    body: JSON.stringify({
-      email,
-    }),
+    body: JSON.stringify(payload),
   })
-}
+
+
+// ========================================
+// CURRENT USER
+// ========================================
+
+export const getCurrentUser = () =>
+  request('/api/auth/me', {
+    method: 'GET',
+  })
+
+
+// ========================================
+// REFRESH SESSION
+// ========================================
+
+export const refreshUserSession = () =>
+  request('/api/auth/refresh', {
+    method: 'POST',
+  })
+
+
+// ========================================
+// LOGOUT
+// ========================================
+
+export const logoutUser = () =>
+  request('/api/auth/logout', {
+    method: 'POST',
+  })

@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
-
+import cookieParser from 'cookie-parser'
 import contactRoutes from './routes/contact.routes.js'
 import healthRoutes from './routes/healthRoutes.js'
 import authRoutes from './routes/authRoutes.js'
@@ -20,12 +20,13 @@ app.use(helmet())
 
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: process.env.CLIENT_URL,
     credentials: true,
   }),
 )
 
 app.use(express.json({ limit: '1mb' }))
+app.use(cookieParser())
 app.use(express.urlencoded({ extended: true, limit: '1mb' }))
 
 if (process.env.NODE_ENV !== 'production') {

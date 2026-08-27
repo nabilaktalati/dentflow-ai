@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
-import { NavLink } from 'react-router'
+import {
+  NavLink,
+  useNavigate,
+} from 'react-router'
 import { AnimatePresence, motion } from "motion/react";
-
+import {
+  useAuth,
+} from '../../features/auth/context/authContext.js'
 import {
   ArrowRight,
-  ArrowUpRight,
   BrainCircuit,
   CalendarDays,
   ChevronDown,
@@ -12,7 +16,7 @@ import {
   ReceiptText,
   X,
 } from "lucide-react";
-
+import BookingCTA from '../../features/auth/components/BookingCTA.jsx'
 import BrandLogo from "../ui/BrandLogo.jsx";
 import Button from "../ui/Button.jsx";
 import Container from "../ui/Container.jsx";
@@ -177,6 +181,21 @@ function DesktopDropdown({
 }
 
 function Navbar() {
+  const navigate = useNavigate()
+
+  const {
+    isAuthenticated,
+    isAuthLoading,
+    logout,
+  } = useAuth()
+
+  const handleLogout = async () => {
+    await logout()
+
+    navigate('/', {
+      replace: true,
+    })
+  }
   const [scrolled, setScrolled] = useState(false);
   const [menuPath, setMenuPath] = useState(null);
   const [servicesOpen, setServicesOpen] = useState(false);
@@ -390,23 +409,30 @@ function Navbar() {
                 Sistem Aktif
               </div>
 
-              <Button
-                to="/login"
-                variant="ghost"
-                size="sm"
-                className="!text-[#667085] hover:!bg-[#F7F8FC] hover:!text-[#101828]"
-              >
-                Giriş
-              </Button>
+              {!isAuthLoading &&
+  (isAuthenticated ? (
+    <button
+      type="button"
+      onClick={handleLogout}
+      className="rounded-lg px-3 py-2 text-sm font-medium text-[#667085] transition hover:bg-[#F7F8FC] hover:text-[#101828]"
+    >
+      Çıkış Yap
+    </button>
+  ) : (
+    <Button
+      to="/login"
+      variant="ghost"
+      size="sm"
+      className="!text-[#667085] hover:!bg-[#F7F8FC] hover:!text-[#101828]"
+    >
+      Giriş
+    </Button>
+  ))}
 
-              <Button
-                to="/register"
-                size="sm"
-                className="!rounded-xl !border-0 !bg-[#5956F5] !px-5 !text-white !shadow-[0_8px_20px_rgba(89,86,245,0.20)] hover:!bg-[#4B48E8]"
-              >
-                Randevu Al
-                <ArrowUpRight className="size-4" />
-              </Button>
+              <BookingCTA
+  size="sm"
+  className="!rounded-xl !border-0 !bg-[#5956F5] !px-5 !text-white !shadow-[0_8px_20px_rgba(89,86,245,0.20)] hover:!bg-[#4B48E8]"
+/>
             </div>
 
             <button
@@ -586,15 +612,10 @@ function Navbar() {
                 </div>
 
                 <div className="grid gap-3">
-                  <Button
-                    to="/register"
-                    size="lg"
-                    onClick={closeMenu}
-                    className="!w-full !rounded-xl !border-0 !bg-[#5956F5] !text-white !shadow-[0_8px_20px_rgba(89,86,245,0.18)] hover:!bg-[#4B48E8]"
-                  >
-                    Randevu Al
-                    <ArrowUpRight className="size-4" />
-                  </Button>
+                  <BookingCTA
+  size="sm"
+  className="!rounded-xl !border-0 !bg-[#5956F5] !px-5 !text-white !shadow-[0_8px_20px_rgba(89,86,245,0.20)] hover:!bg-[#4B48E8]"
+/>
 
                   <Button
                     to="/login"
@@ -614,5 +635,4 @@ function Navbar() {
     </>
   );
 }
-
 export default Navbar;
