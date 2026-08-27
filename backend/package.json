@@ -10,7 +10,8 @@
     "test:db-validation": "node scripts/testDatabaseValidation.js",
     "test:auth": "node scripts/testAuthFlow.js",
     "clear:users": "node scripts/clearAllUsers.js",
-    "test:rbac": "node scripts/testRbac.js"
+    "test:rbac": "node scripts/testRbac.js",
+    "seed:admin": "node scripts/seedAdmin.js"
   },
   "keywords": [],
   "author": "",

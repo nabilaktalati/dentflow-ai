@@ -116,7 +116,19 @@ useEffect(() => {
     setError('')
   }
 
-const handleSuccessTransition = async () => {
+const getRoleRedirectPath = (role) => {
+  if (role === 'ADMIN') {
+    return '/admin'
+  }
+
+  if (role === 'DOCTOR') {
+    return '/doctor'
+  }
+
+  return '/patient'
+}
+
+const handleSuccessTransition = async (role) => {
   setTransitioning(true)
   setPanelSide('right')
 
@@ -124,12 +136,14 @@ const handleSuccessTransition = async () => {
 
   setStep('success')
 
-  // Başarı ekranı ve yükleme göstergesi
   await wait(1750)
 
-  navigate('/', {
-    replace: true,
-  })
+  navigate(
+    getRoleRedirectPath(role),
+    {
+      replace: true,
+    },
+  )
 }
 
 

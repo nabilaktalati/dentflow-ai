@@ -11,6 +11,13 @@ import PrivacyPage from '../features/legal/pages/PrivacyPage.jsx'
 import TermsPage from '../features/legal/pages/TermsPage.jsx'
 import RegisterPage from "../features/auth/pages/RegisterPage.jsx";
 import LoginPage from '../features/auth/pages/LoginPage.jsx'
+import ProtectedRoute from '../features/auth/components/ProtectedRoute.jsx'
+import RoleRoute from '../features/auth/components/RoleRoute.jsx'
+import DashboardLayout from '../features/dashboard/layouts/DashboardLayout.jsx'
+import PatientDashboardPage from '../features/dashboard/patient/pages/PatientDashboardPage.jsx'
+import DoctorDashboardPage from '../features/dashboard/doctor/pages/DoctorDashboardPage.jsx'
+import AdminDashboardPage from '../features/dashboard/admin/pages/AdminDashboardPage.jsx'
+import DashboardSectionPage from '../features/dashboard/components/DashboardSectionPage.jsx'
 const router = createBrowserRouter([
   // PUBLIC WEBSITE
   {
@@ -59,6 +66,210 @@ const router = createBrowserRouter([
     ],
   },
 
+
+
+   // ROLE-BASED DASHBOARDS
+
+ {
+  path: '/patient',
+  element: (
+    <ProtectedRoute>
+      <RoleRoute allowedRoles={['PATIENT']}>
+        <DashboardLayout />
+      </RoleRoute>
+    </ProtectedRoute>
+  ),
+  children: [
+    {
+      index: true,
+      element: <PatientDashboardPage />,
+    },
+    {
+      path: 'appointments',
+      element: (
+        <DashboardSectionPage
+          eyebrow="HASTA PANELİ"
+          title="Randevularım"
+          description="Planlanan ve geçmiş randevularınızı bu alandan takip edebilirsiniz."
+        />
+      ),
+    },
+    {
+      path: 'treatments',
+      element: (
+        <DashboardSectionPage
+          eyebrow="HASTA PANELİ"
+          title="Tedavi Sürecim"
+          description="Tedavi planınız ve klinik süreciniz bu alanda görüntülenecek."
+        />
+      ),
+    },
+    {
+      path: 'invoices',
+      element: (
+        <DashboardSectionPage
+          eyebrow="HASTA PANELİ"
+          title="Faturalarım"
+          description="Klinik faturalarınız ve ödeme bilgileri bu alanda yer alacak."
+        />
+      ),
+    },
+    {
+      path: 'messages',
+      element: (
+        <DashboardSectionPage
+          eyebrow="HASTA PANELİ"
+          title="Mesajlar"
+          description="Klinik ekibiyle güvenli iletişiminizi bu alandan yöneteceksiniz."
+        />
+      ),
+    },
+    {
+      path: 'profile',
+      element: (
+        <DashboardSectionPage
+          eyebrow="HASTA PANELİ"
+          title="Profilim"
+          description="Hesap ve profil bilgilerinizi bu alandan yönetebileceksiniz."
+        />
+      ),
+    },
+  ],
+},
+
+  {
+  path: '/doctor',
+  element: (
+    <ProtectedRoute>
+      <RoleRoute allowedRoles={['DOCTOR']}>
+        <DashboardLayout />
+      </RoleRoute>
+    </ProtectedRoute>
+  ),
+  children: [
+    {
+      index: true,
+      element: <DoctorDashboardPage />,
+    },
+    {
+      path: 'appointments',
+      element: (
+        <DashboardSectionPage
+          eyebrow="DOKTOR PANELİ"
+          title="Randevular"
+          description="Günlük, yaklaşan ve geçmiş hasta randevularınızı bu alandan yöneteceksiniz."
+        />
+      ),
+    },
+    {
+      path: 'patients',
+      element: (
+        <DashboardSectionPage
+          eyebrow="DOKTOR PANELİ"
+          title="Hastalar"
+          description="Size bağlı hasta kayıtları ve klinik süreçler bu alanda görüntülenecek."
+        />
+      ),
+    },
+    {
+      path: 'messages',
+      element: (
+        <DashboardSectionPage
+          eyebrow="DOKTOR PANELİ"
+          title="Mesajlar"
+          description="Hasta ve klinik ekibiyle güvenli iletişiminizi bu alandan yöneteceksiniz."
+        />
+      ),
+    },
+    {
+      path: 'profile',
+      element: (
+        <DashboardSectionPage
+          eyebrow="DOKTOR PANELİ"
+          title="Profil"
+          description="Doktor hesap ve profil bilgilerinizi bu alandan yönetebileceksiniz."
+        />
+      ),
+    },
+  ],
+},
+
+{
+  path: '/admin',
+  element: (
+    <ProtectedRoute>
+      <RoleRoute
+        allowedRoles={['ADMIN']}
+      >
+        <DashboardLayout />
+      </RoleRoute>
+    </ProtectedRoute>
+  ),
+
+  children: [
+    {
+      index: true,
+      element: (
+        <AdminDashboardPage />
+      ),
+    },
+
+    {
+      path: 'doctors',
+      element: (
+        <DashboardSectionPage
+          eyebrow="YÖNETİCİ PANELİ"
+          title="Doktor Yönetimi"
+          description="Klinikte görev yapan doktor hesaplarının yönetileceği çalışma alanı."
+        />
+      ),
+    },
+
+    {
+      path: 'appointments',
+      element: (
+        <DashboardSectionPage
+          eyebrow="YÖNETİCİ PANELİ"
+          title="Randevular"
+          description="Klinikteki randevu süreçlerinin merkezi olarak yönetileceği çalışma alanı."
+        />
+      ),
+    },
+
+    {
+      path: 'patients',
+      element: (
+        <DashboardSectionPage
+          eyebrow="YÖNETİCİ PANELİ"
+          title="Hastalar"
+          description="Klinik hastalarının ve ilgili kayıtların yönetileceği çalışma alanı."
+        />
+      ),
+    },
+
+    {
+      path: 'messages',
+      element: (
+        <DashboardSectionPage
+          eyebrow="YÖNETİCİ PANELİ"
+          title="Mesajlar"
+          description="Klinik içi iletişim ve mesajlaşma alanı."
+        />
+      ),
+    },
+
+    {
+      path: 'settings',
+      element: (
+        <DashboardSectionPage
+          eyebrow="YÖNETİCİ PANELİ"
+          title="Ayarlar"
+          description="DentFlow sistem ve klinik ayarlarının yönetileceği çalışma alanı."
+        />
+      ),
+    },
+  ],
+},
   // STANDALONE OPERATION PAGES
   {
     path: "/randevu-sorgula",
@@ -68,6 +279,8 @@ const router = createBrowserRouter([
     path: "/fatura-sorgula",
     element: <InvoiceQueryPage />,
   },
+
+  
 ]);
 
 export default router;
