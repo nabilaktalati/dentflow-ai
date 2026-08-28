@@ -99,7 +99,27 @@ const doctorProfileSchema = new mongoose.Schema(
       trim: true,
       default: '',
     },
+cv: {
+  fileName: {
+    type: String,
+    default: '',
+  },
 
+  publicId: {
+    type: String,
+    default: '',
+  },
+
+  resourceType: {
+    type: String,
+    default: '',
+  },
+
+  uploadedAt: {
+    type: Date,
+    default: null,
+  },
+},
     isActive: {
       type: Boolean,
       default: true,

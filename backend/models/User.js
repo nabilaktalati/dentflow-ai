@@ -42,10 +42,15 @@ const userSchema = new mongoose.Schema(
       index: true,
     },
 
-    lastLoginAt: {
-      type: Date,
-      default: null,
-    },
+   lastLoginAt: {
+  type: Date,
+  default: null,
+},
+
+mustChangePassword: {
+  type: Boolean,
+  default: false,
+},
   },
   {
     timestamps: true,

@@ -14,10 +14,11 @@ export default function ProtectedRoute({
   const location =
     useLocation()
 
-  const {
-    isAuthenticated,
-    isAuthLoading,
-  } = useAuth()
+const {
+  user,
+  isAuthenticated,
+  isAuthLoading,
+} = useAuth()
 
   /*
    * أثناء فحص /me أو /refresh
@@ -48,6 +49,17 @@ export default function ProtectedRoute({
       />
     )
   }
-
+if (
+  user?.mustChangePassword &&
+  location.pathname !==
+    '/change-password'
+) {
+  return (
+    <Navigate
+      to="/change-password"
+      replace
+    />
+  )
+}
   return children
 }

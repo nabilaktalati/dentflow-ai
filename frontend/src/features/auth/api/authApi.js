@@ -173,3 +173,19 @@ export const logoutUser = () =>
   request('/api/auth/logout', {
     method: 'POST',
   })
+  // ========================================
+// CHANGE PASSWORD
+// ========================================
+
+export const changePasswordUser = (
+  payload,
+) =>
+  request(
+    '/api/auth/change-password',
+    {
+      method: 'POST',
+      body: JSON.stringify(
+        payload,
+      ),
+    },
+  )

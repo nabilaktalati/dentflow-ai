@@ -6,12 +6,12 @@ import cookieParser from 'cookie-parser'
 import contactRoutes from './routes/contact.routes.js'
 import healthRoutes from './routes/healthRoutes.js'
 import authRoutes from './routes/authRoutes.js'
-
+import adminDoctorRoutes from './routes/adminDoctorRoutes.js'
 import {
   errorHandler,
   notFound,
 } from './middleware/errorMiddleware.js'
-
+import doctorRoutes from './routes/doctorRoutes.js'
 const app = express()
 
 app.disable('x-powered-by')
@@ -36,7 +36,14 @@ if (process.env.NODE_ENV !== 'production') {
 app.use('/api/health', healthRoutes)
 app.use('/api/contact', contactRoutes)
 app.use('/api/auth', authRoutes)
-
+app.use(
+  '/api/doctors',
+  doctorRoutes,
+)
+app.use(
+  '/api/admin/doctors',
+  adminDoctorRoutes,
+)
 app.use(notFound)
 app.use(errorHandler)
 

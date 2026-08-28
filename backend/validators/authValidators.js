@@ -68,3 +68,46 @@ export const loginSchema = z.object({
       'Şifre zorunludur.',
     ),
 })
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z
+      .string()
+      .min(
+        1,
+        'Mevcut şifre zorunludur.',
+      ),
+
+    newPassword:
+      passwordSchema,
+
+    confirmPassword: z
+      .string()
+      .min(
+        1,
+        'Şifre tekrarı zorunludur.',
+      ),
+  })
+  .refine(
+    (data) =>
+      data.newPassword ===
+      data.confirmPassword,
+    {
+      message:
+        'Yeni şifreler eşleşmiyor.',
+      path: [
+        'confirmPassword',
+      ],
+    },
+  )
+  .refine(
+    (data) =>
+      data.currentPassword !==
+      data.newPassword,
+    {
+      message:
+        'Yeni şifre mevcut şifreden farklı olmalıdır.',
+      path: [
+        'newPassword',
+      ],
+    },
+  )

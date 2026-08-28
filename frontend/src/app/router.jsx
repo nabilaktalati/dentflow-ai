@@ -17,7 +17,9 @@ import DashboardLayout from '../features/dashboard/layouts/DashboardLayout.jsx'
 import PatientDashboardPage from '../features/dashboard/patient/pages/PatientDashboardPage.jsx'
 import DoctorDashboardPage from '../features/dashboard/doctor/pages/DoctorDashboardPage.jsx'
 import AdminDashboardPage from '../features/dashboard/admin/pages/AdminDashboardPage.jsx'
+import AdminDoctorsPage from '../features/dashboard/admin/pages/AdminDoctorsPage.jsx'
 import DashboardSectionPage from '../features/dashboard/components/DashboardSectionPage.jsx'
+import ChangePasswordPage from '../features/auth/pages/ChangePasswordPage.jsx'
 const router = createBrowserRouter([
   // PUBLIC WEBSITE
   {
@@ -214,16 +216,10 @@ const router = createBrowserRouter([
       ),
     },
 
-    {
-      path: 'doctors',
-      element: (
-        <DashboardSectionPage
-          eyebrow="YÖNETİCİ PANELİ"
-          title="Doktor Yönetimi"
-          description="Klinikte görev yapan doktor hesaplarının yönetileceği çalışma alanı."
-        />
-      ),
-    },
+{
+  path: 'doctors',
+  element: <AdminDoctorsPage />,
+},
 
     {
       path: 'appointments',
@@ -270,6 +266,15 @@ const router = createBrowserRouter([
     },
   ],
 },
+{
+  path: '/change-password',
+  element: (
+    <ProtectedRoute>
+      <ChangePasswordPage />
+    </ProtectedRoute>
+  ),
+},
+
   // STANDALONE OPERATION PAGES
   {
     path: "/randevu-sorgula",

@@ -8,6 +8,7 @@ import {
   AuthContext,
 } from './authContext.js'
 import {
+  changePasswordUser,
   getCurrentUser,
   logoutUser,
   refreshUserSession,
@@ -173,7 +174,29 @@ export const AuthProvider = ({
       }
     }, [])
 
+/*
+ * Kullanıcı şifresini değiştirir.
+ * Backend yeni kullanıcı durumunu döndürür
+ * ve React state güncellenir.
+ */
+const changePassword =
+  useCallback(
+    async (payload) => {
+      const response =
+        await changePasswordUser(
+          payload,
+        )
 
+      const updatedUser =
+        response.data?.user ||
+        null
+
+      setUser(updatedUser)
+
+      return updatedUser
+    },
+    [],
+  )
   /*
    * Gerçek Logout:
    * Backend Session iptal edilir
@@ -190,28 +213,31 @@ export const AuthProvider = ({
 
 
   const value =
-    useMemo(
-      () => ({
-        user,
+  useMemo(
+    () => ({
+      user,
 
-        isAuthenticated:
-          Boolean(user),
+      isAuthenticated:
+        Boolean(user),
 
-        isAuthLoading,
+      isAuthLoading,
 
-        completeLogin,
+      completeLogin,
 
-        syncUser,
+      syncUser,
 
-        logout,
-      }),
+      changePassword,
+
+      logout,
+    }),
       [
-        user,
-        isAuthLoading,
-        completeLogin,
-        syncUser,
-        logout,
-      ],
+  user,
+  isAuthLoading,
+  completeLogin,
+  syncUser,
+  changePassword,
+  logout,
+],
     )
 
 

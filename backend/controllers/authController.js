@@ -11,6 +11,7 @@ import {
   registerSchema,
   verifyEmailSchema,
   resendVerificationSchema,
+  changePasswordSchema,
 } from '../validators/authValidators.js'
 
 import {
@@ -731,6 +732,122 @@ export const login = async (
       message:
         'Giriş başarılı.',
       data: {
+  user: {
+    id: user._id,
+    email: user.email,
+    role: user.role,
+    status: user.status,
+    isEmailVerified:
+      user.isEmailVerified,
+
+    mustChangePassword:
+      Boolean(
+        user.mustChangePassword,
+      ),
+  },
+},
+    })
+   } catch (error) {
+    return next(error)
+  }
+}
+
+
+// ========================================
+// CHANGE PASSWORD
+// ========================================
+
+export const changePassword = async (
+  req,
+  res,
+  next,
+) => {
+  try {
+    // 1. Gelen bilgileri doğrula
+    const validationResult =
+      changePasswordSchema.safeParse(
+        req.body,
+      )
+
+    if (!validationResult.success) {
+      return res.status(400).json({
+        success: false,
+        message:
+          'Şifre bilgileri geçersiz.',
+        errors:
+          validationResult.error
+            .flatten()
+            .fieldErrors,
+      })
+    }
+
+    const {
+      currentPassword,
+      newPassword,
+    } = validationResult.data
+
+
+    // 2. Giriş yapan kullanıcıyı bul.
+    // passwordHash normalde gizlidir,
+    // bu işlem için özellikle seçiyoruz.
+    const user =
+      await User.findById(
+        req.auth.userId,
+      ).select('+passwordHash')
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message:
+          'Kullanıcı bulunamadı.',
+      })
+    }
+
+
+    // 3. Mevcut şifre gerçekten doğru mu?
+    const passwordMatches =
+      await comparePassword(
+        currentPassword,
+        user.passwordHash,
+      )
+
+    if (!passwordMatches) {
+      return res.status(400).json({
+        success: false,
+        message:
+          'Mevcut şifre hatalı.',
+        errors: {
+          currentPassword: [
+            'Mevcut şifre hatalı.',
+          ],
+        },
+      })
+    }
+
+
+    // 4. Yeni şifreyi güvenli şekilde hashle
+    const passwordHash =
+      await hashPassword(
+        newPassword,
+      )
+
+
+    // 5. Yeni şifreyi kaydet ve
+    // ilk giriş zorunluluğunu kaldır.
+    user.passwordHash =
+      passwordHash
+
+    user.mustChangePassword =
+      false
+
+    await user.save()
+
+
+    return res.status(200).json({
+      success: true,
+      message:
+        'Şifreniz başarıyla değiştirildi.',
+      data: {
         user: {
           id: user._id,
           email: user.email,
@@ -738,10 +855,13 @@ export const login = async (
           status: user.status,
           isEmailVerified:
             user.isEmailVerified,
+
+          mustChangePassword:
+            user.mustChangePassword,
         },
       },
     })
-   } catch (error) {
+  } catch (error) {
     return next(error)
   }
 }
@@ -771,15 +891,20 @@ export const getMe = async (
     return res.status(200).json({
       success: true,
       data: {
-        user: {
-          id: user._id,
-          email: user.email,
-          role: user.role,
-          status: user.status,
-          isEmailVerified:
-            user.isEmailVerified,
-        },
-      },
+  user: {
+    id: user._id,
+    email: user.email,
+    role: user.role,
+    status: user.status,
+    isEmailVerified:
+      user.isEmailVerified,
+
+    mustChangePassword:
+      Boolean(
+        user.mustChangePassword,
+      ),
+  },
+},
     })
   } catch (error) {
     return next(error)

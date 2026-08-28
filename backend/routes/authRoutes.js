@@ -8,6 +8,7 @@ import {
   registerPatient,
   verifyEmail,
   resendVerification,
+  changePassword,
 } from '../controllers/authController.js'
 
 import {
@@ -49,5 +50,9 @@ router.get(
   authenticate,
   getMe,
 )
-
+router.post(
+  '/change-password',
+  authenticate,
+  changePassword,
+)
 export default router
