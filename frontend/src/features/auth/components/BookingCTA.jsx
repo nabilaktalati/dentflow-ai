@@ -27,6 +27,7 @@ export default function BookingCTA({
   const navigate = useNavigate()
 
   const {
+    user,
     isAuthenticated,
     isAuthLoading,
   } = useAuth()
@@ -43,7 +44,21 @@ export default function BookingCTA({
     }
 
     if (isAuthenticated) {
-      navigate('/doctors')
+      if (user?.role === 'PATIENT') {
+        navigate('/patient/book')
+        return
+      }
+
+      if (user?.role === 'DOCTOR') {
+        navigate('/doctor')
+        return
+      }
+
+      if (user?.role === 'ADMIN') {
+        navigate('/admin')
+        return
+      }
+
       return
     }
 

@@ -13,6 +13,7 @@ import {
 } from 'motion/react'
 import DoctorSchedulePanel from '../components/DoctorSchedulePanel.jsx'
 import DoctorSpecialDaysPanel from '../components/DoctorSpecialDaysPanel.jsx'
+import DoctorAppointmentsList from '../components/DoctorAppointmentsList.jsx'
 const tabs = [
   {
     id: 'appointments',
@@ -105,12 +106,9 @@ export default function DoctorAppointmentsPage() {
 
       <div className="mt-6">
         {activeTab ===
-          'appointments' && (
-          <SectionShell
-            title="Randevularım"
-            description="Hasta randevuları rezervasyon sistemi tamamlandığında bu alanda görüntülenecek."
-          />
-        )}
+  'appointments' && (
+    <DoctorAppointmentsList />
+)}
 
         {activeTab ===
   'schedule' && (
@@ -123,37 +121,5 @@ export default function DoctorAppointmentsPage() {
 )}
       </div>
     </div>
-  )
-}
-
-
-function SectionShell({
-  title,
-  description,
-}) {
-  return (
-    <motion.section
-      key={title}
-      initial={{
-        opacity: 0,
-        y: 8,
-      }}
-      animate={{
-        opacity: 1,
-        y: 0,
-      }}
-      transition={{
-        duration: 0.25,
-      }}
-      className="rounded-[24px] border border-white/80 bg-white/75 p-6 shadow-[0_18px_50px_rgba(69,61,128,0.06)] backdrop-blur-xl"
-    >
-      <h2 className="text-[18px] font-semibold tracking-[-0.02em] text-[#172033]">
-        {title}
-      </h2>
-
-      <p className="mt-2 text-[13px] leading-6 text-[#7A8497]">
-        {description}
-      </p>
-    </motion.section>
   )
 }

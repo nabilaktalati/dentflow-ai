@@ -456,10 +456,31 @@ const dashboardPath =
     </Button>
   ))}
 
-              <BookingCTA
-  size="sm"
-  className="!rounded-xl !border-0 !bg-[#5956F5] !px-5 !text-white !shadow-[0_8px_20px_rgba(89,86,245,0.20)] hover:!bg-[#4B48E8]"
-/>
+             {!isAuthLoading &&
+  (isAuthenticated ? (
+    user?.role === 'PATIENT' ? (
+      <NavLink
+        to="/patient/book"
+        className="
+          inline-flex items-center gap-2
+          rounded-xl bg-[#5956F5] px-5 py-2.5
+          text-sm font-semibold text-white
+          shadow-[0_8px_20px_rgba(89,86,245,0.20)]
+          transition
+          hover:bg-[#4B48E8]
+        "
+      >
+        Randevu Al
+
+        <ArrowRight className="size-4" />
+      </NavLink>
+    ) : null
+  ) : (
+    <BookingCTA
+      size="sm"
+      className="!rounded-xl !border-0 !bg-[#5956F5] !px-5 !text-white !shadow-[0_8px_20px_rgba(89,86,245,0.20)] hover:!bg-[#4B48E8]"
+    />
+  ))}
             </div>
 
             <button
@@ -639,10 +660,32 @@ const dashboardPath =
                 </div>
 
                 <div className="grid gap-3">
-                  <BookingCTA
-  size="sm"
-  className="!rounded-xl !border-0 !bg-[#5956F5] !px-5 !text-white !shadow-[0_8px_20px_rgba(89,86,245,0.20)] hover:!bg-[#4B48E8]"
-/>
+                 {!isAuthLoading &&
+  (isAuthenticated ? (
+    user?.role === 'PATIENT' ? (
+      <NavLink
+        to="/patient/book"
+        onClick={closeMenu}
+        className="
+          flex w-full items-center justify-center gap-2
+          rounded-xl bg-[#5956F5] px-5 py-3
+          text-sm font-semibold text-white
+          shadow-[0_8px_20px_rgba(89,86,245,0.20)]
+          transition
+          hover:bg-[#4B48E8]
+        "
+      >
+        Randevu Al
+
+        <ArrowRight className="size-4" />
+      </NavLink>
+    ) : null
+  ) : (
+    <BookingCTA
+      size="sm"
+      className="!w-full !rounded-xl !border-0 !bg-[#5956F5] !px-5 !text-white !shadow-[0_8px_20px_rgba(89,86,245,0.20)] hover:!bg-[#4B48E8]"
+    />
+  ))}
 
                   <Button
                     to="/login"

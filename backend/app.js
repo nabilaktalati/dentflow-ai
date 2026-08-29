@@ -13,6 +13,7 @@ import {
 } from './middleware/errorMiddleware.js'
 import doctorRoutes from './routes/doctorRoutes.js'
 import doctorAvailabilityRoutes from './routes/doctorAvailabilityRoutes.js'
+import appointmentRoutes from './routes/appointmentRoutes.js'
 const app = express()
 
 app.disable('x-powered-by')
@@ -49,6 +50,7 @@ app.use(
   '/api/doctor/availability',
   doctorAvailabilityRoutes,
 )
+app.use('/api/appointments', appointmentRoutes)
 app.use(notFound)
 app.use(errorHandler)
 

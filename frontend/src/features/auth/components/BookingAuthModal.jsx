@@ -26,7 +26,7 @@ export default function BookingAuthModal({
 
     navigate('/login', {
       state: {
-        from: '/doctors',
+        from: '/patient/book',
         bookingIntent: true,
       },
     })
@@ -37,7 +37,7 @@ export default function BookingAuthModal({
 
     navigate('/register', {
       state: {
-        from: '/doctors',
+        from: '/patient/book',
         bookingIntent: true,
       },
     })

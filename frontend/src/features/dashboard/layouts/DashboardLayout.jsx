@@ -10,6 +10,7 @@ import {
 import BrandLogo from '../../../components/ui/BrandLogo.jsx'
 import {
   CalendarDays,
+  CalendarPlus,
   ChevronLeft,
   FileText,
   LayoutDashboard,
@@ -35,39 +36,49 @@ import {
 
 const roleNavigation = {
   PATIENT: [
-    {
-      label: 'Genel Bakış',
-      to: '/patient',
-      icon: LayoutDashboard,
-      end: true,
-    },
-    {
-      label: 'Randevularım',
-      to: '/patient/appointments',
-      icon: CalendarDays,
-    },
-    {
-      label: 'Tedavi Sürecim',
-      to: '/patient/treatments',
-      icon: Stethoscope,
-    },
-    {
-      label: 'Faturalarım',
-      to: '/patient/invoices',
-      icon: FileText,
-    },
-    {
-      label: 'Mesajlar',
-      to: '/patient/messages',
-      icon: MessageCircle,
-    },
-    {
-      label: 'Profilim',
-      to: '/patient/profile',
-      icon: UserRound,
-    },
-  ],
+  {
+    label: 'Genel Bakış',
+    to: '/patient',
+    icon: LayoutDashboard,
+    end: true,
+  },
 
+  {
+    label: 'Randevu Al',
+    to: '/patient/book',
+    icon: CalendarPlus,
+  },
+
+  {
+    label: 'Randevularım',
+    to: '/patient/appointments',
+    icon: CalendarDays,
+  },
+
+  {
+    label: 'Tedavi Sürecim',
+    to: '/patient/treatments',
+    icon: Stethoscope,
+  },
+
+  {
+    label: 'Faturalarım',
+    to: '/patient/invoices',
+    icon: FileText,
+  },
+
+  {
+    label: 'Mesajlar',
+    to: '/patient/messages',
+    icon: MessageCircle,
+  },
+
+  {
+    label: 'Profilim',
+    to: '/patient/profile',
+    icon: UserRound,
+  },
+],
   DOCTOR: [
     {
       label: 'Genel Bakış',

@@ -51,7 +51,10 @@ const appointmentSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-
+slotKey: {
+  type: String,
+  default: null,
+},
     patientNote: {
       type: String,
       trim: true,
@@ -101,7 +104,19 @@ appointmentSchema.index({
   doctor: 1,
   startAt: -1,
 })
-
+appointmentSchema.index(
+  {
+    slotKey: 1,
+  },
+  {
+    unique: true,
+    partialFilterExpression: {
+      slotKey: {
+        $type: 'string',
+      },
+    },
+  },
+)
 const Appointment = mongoose.model(
   'Appointment',
   appointmentSchema,
