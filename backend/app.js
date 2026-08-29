@@ -12,6 +12,7 @@ import {
   notFound,
 } from './middleware/errorMiddleware.js'
 import doctorRoutes from './routes/doctorRoutes.js'
+import doctorAvailabilityRoutes from './routes/doctorAvailabilityRoutes.js'
 const app = express()
 
 app.disable('x-powered-by')
@@ -43,6 +44,10 @@ app.use(
 app.use(
   '/api/admin/doctors',
   adminDoctorRoutes,
+)
+app.use(
+  '/api/doctor/availability',
+  doctorAvailabilityRoutes,
 )
 app.use(notFound)
 app.use(errorHandler)
