@@ -1,15 +1,76 @@
-import PatientProfile from '../models/PatientProfile.js'
+import mongoose from 'mongoose'
+
 import Appointment from '../models/Appointment.js'
+import DoctorProfile from '../models/DoctorProfile.js'
+import PatientProfile from '../models/PatientProfile.js'
 
 import {
   createAppointmentSchema,
+  cancelAppointmentSchema,
 } from '../validators/appointmentValidators.js'
 
 import {
   createPatientAppointment,
 } from '../services/bookingService.js'
 
-import DoctorProfile from '../models/DoctorProfile.js'
+import {
+  cancelPatientAppointment,
+} from '../services/appointmentOperationsService.js'
+
+
+const sendValidationError = (
+  res,
+  result,
+  message,
+) =>
+  res
+    .status(400)
+    .json({
+      success: false,
+
+      message,
+
+      errors:
+        result.error.issues.map(
+          (issue) => ({
+            field:
+              issue.path.join('.'),
+
+            message:
+              issue.message,
+          }),
+        ),
+    })
+
+
+const handleOperationError = (
+  error,
+  res,
+  next,
+) => {
+  if (
+    error.statusCode &&
+    error.code
+  ) {
+    return res
+      .status(
+        error.statusCode,
+      )
+      .json({
+        success: false,
+
+        code:
+          error.code,
+
+        message:
+          error.message,
+      })
+  }
+
+  return next(error)
+}
+
+
 export const createAppointment =
   async (
     req,
@@ -26,27 +87,11 @@ export const createAppointment =
         )
 
       if (!result.success) {
-        return res
-          .status(400)
-          .json({
-            success: false,
-
-            message:
-              'Randevu bilgileri geçerli değil.',
-
-            errors:
-              result.error.issues.map(
-                (issue) => ({
-                  field:
-                    issue.path.join(
-                      '.',
-                    ),
-
-                  message:
-                    issue.message,
-                }),
-              ),
-          })
+        return sendValidationError(
+          res,
+          result,
+          'Randevu bilgileri geçerli değil.',
+        )
       }
 
       const {
@@ -108,26 +153,11 @@ export const createAppointment =
           },
         })
     } catch (error) {
-      if (
-        error.statusCode &&
-        error.code
-      ) {
-        return res
-          .status(
-            error.statusCode,
-          )
-          .json({
-            success: false,
-
-            code:
-              error.code,
-
-            message:
-              error.message,
-          })
-      }
-
-      return next(error)
+      return handleOperationError(
+        error,
+        res,
+        next,
+      )
     }
   }
 
@@ -142,10 +172,6 @@ export const getMyAppointments =
       const patientUserId =
         req.auth.userId
 
-      /*
-       * Oturum açmış kullanıcıya ait
-       * hasta profilini bul.
-       */
       const patientProfile =
         await PatientProfile.findOne({
           user:
@@ -165,10 +191,6 @@ export const getMyAppointments =
           })
       }
 
-      /*
-       * Hastanın gerçek randevularını getir.
-       * DoctorProfile doğrudan populate edilir.
-       */
       const appointments =
         await Appointment.find({
           patient:
@@ -238,6 +260,15 @@ export const getMyAppointments =
             status:
               appointment.status,
 
+            statusUpdatedAt:
+              appointment.statusUpdatedAt,
+
+            cancelledAt:
+              appointment.cancelledAt,
+
+            cancellationReason:
+              appointment.cancellationReason,
+
             patientNote:
               appointment.patientNote,
 
@@ -260,7 +291,9 @@ export const getMyAppointments =
       return next(error)
     }
   }
-  export const getDoctorAppointments =
+
+
+export const getDoctorAppointments =
   async (
     req,
     res,
@@ -272,8 +305,11 @@ export const getMyAppointments =
 
       const doctorProfile =
         await DoctorProfile.findOne({
-          user: doctorUserId,
-          isActive: true,
+          user:
+            doctorUserId,
+
+          isActive:
+            true,
         })
           .select('_id')
           .lean()
@@ -283,6 +319,7 @@ export const getMyAppointments =
           .status(404)
           .json({
             success: false,
+
             message:
               'Doktor profili bulunamadı.',
           })
@@ -295,6 +332,7 @@ export const getMyAppointments =
         })
           .populate({
             path: 'patient',
+
             select:
               'firstName lastName phone',
           })
@@ -341,6 +379,15 @@ export const getMyAppointments =
             status:
               appointment.status,
 
+            statusUpdatedAt:
+              appointment.statusUpdatedAt,
+
+            cancelledAt:
+              appointment.cancelledAt,
+
+            cancellationReason:
+              appointment.cancellationReason,
+
             patientNote:
               appointment.patientNote,
 
@@ -361,5 +408,98 @@ export const getMyAppointments =
         })
     } catch (error) {
       return next(error)
+    }
+  }
+
+
+export const cancelMyAppointment =
+  async (
+    req,
+    res,
+    next,
+  ) => {
+    try {
+      const {
+        appointmentId,
+      } = req.params
+
+      if (
+        !mongoose.isValidObjectId(
+          appointmentId,
+        )
+      ) {
+        return res
+          .status(400)
+          .json({
+            success: false,
+
+            code:
+              'INVALID_APPOINTMENT_ID',
+
+            message:
+              'Geçerli bir randevu kimliği gereklidir.',
+          })
+      }
+
+      const result =
+        cancelAppointmentSchema.safeParse(
+          req.body,
+        )
+
+      if (!result.success) {
+        return sendValidationError(
+          res,
+          result,
+          'İptal bilgileri geçerli değil.',
+        )
+      }
+
+      const appointment =
+        await cancelPatientAppointment({
+          appointmentId,
+
+          patientUserId:
+            req.auth.userId,
+
+          cancellationReason:
+            result.data.cancellationReason,
+        })
+
+      return res
+        .status(200)
+        .json({
+          success: true,
+
+          message:
+            'Randevunuz başarıyla iptal edildi.',
+
+          data: {
+            appointment: {
+              id:
+                appointment._id,
+
+              appointmentCode:
+                appointment.appointmentCode,
+
+              status:
+                appointment.status,
+
+              statusUpdatedAt:
+                appointment.statusUpdatedAt,
+
+              cancelledAt:
+                appointment.cancelledAt,
+
+              cancellationReason:
+                appointment.cancellationReason,
+            },
+          },
+        })
+    } catch (error) {
+      return handleOperationError(
+        error,
+        res,
+        next,
+      )
     }
   }

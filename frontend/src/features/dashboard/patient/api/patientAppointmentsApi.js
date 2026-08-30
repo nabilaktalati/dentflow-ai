@@ -147,3 +147,35 @@ export const createAppointment =
       response,
     )
   }
+  export const cancelMyAppointment =
+  async ({
+    appointmentId,
+    cancellationReason,
+  }) => {
+    const response =
+      await fetch(
+        `${API_BASE_URL}/api/appointments/${appointmentId}/cancel`,
+        {
+          method: 'PATCH',
+
+          credentials:
+            'include',
+
+          headers: {
+            Accept:
+              'application/json',
+
+            'Content-Type':
+              'application/json',
+          },
+
+          body: JSON.stringify({
+            cancellationReason,
+          }),
+        },
+      )
+
+    return parseResponse(
+      response,
+    )
+  }
