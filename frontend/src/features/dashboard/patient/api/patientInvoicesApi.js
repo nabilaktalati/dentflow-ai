@@ -20,41 +20,11 @@ const parseResponse = async (
 }
 
 
-export const createTreatmentRecord =
-  async (payload) => {
-    const response =
-      await fetch(
-        `${API_BASE_URL}/api/treatments`,
-        {
-          method: 'POST',
-
-          credentials:
-            'include',
-
-          headers: {
-            'Content-Type':
-              'application/json',
-
-            Accept:
-              'application/json',
-          },
-
-          body: JSON.stringify(
-            payload,
-          ),
-        },
-      )
-
-    return parseResponse(
-      response,
-    )
-  }
-
-  export const getDoctorTreatments =
+export const getMyInvoices =
   async () => {
     const response =
       await fetch(
-        `${API_BASE_URL}/api/treatments/doctor/my`,
+        `${API_BASE_URL}/api/invoices/my`,
         {
           method: 'GET',
 

@@ -24,6 +24,9 @@ import DoctorAppointmentsPage from '../features/dashboard/doctor/pages/DoctorApp
 import PatientAppointmentsPage from '../features/dashboard/patient/pages/PatientAppointmentsPage.jsx'
 import PatientBookingPage from '../features/dashboard/patient/pages/PatientBookingPage.jsx'
 import PatientTreatmentsPage from '../features/dashboard/patient/pages/PatientTreatmentsPage.jsx'
+import DoctorInvoicesPage from '../features/dashboard/doctor/pages/DoctorInvoicesPage.jsx'
+import PatientInvoicesPage from '../features/dashboard/patient/pages/PatientInvoicesPage.jsx'
+import PatientProfilePage from '../features/dashboard/patient/pages/PatientProfilePage.jsx'
 const router = createBrowserRouter([
   // PUBLIC WEBSITE
   {
@@ -103,15 +106,9 @@ const router = createBrowserRouter([
   element: <PatientTreatmentsPage />,
 },
     {
-      path: 'invoices',
-      element: (
-        <DashboardSectionPage
-          eyebrow="HASTA PANELİ"
-          title="Faturalarım"
-          description="Klinik faturalarınız ve ödeme bilgileri bu alanda yer alacak."
-        />
-      ),
-    },
+  path: 'invoices',
+  element: <PatientInvoicesPage />,
+},
     {
       path: 'messages',
       element: (
@@ -122,16 +119,10 @@ const router = createBrowserRouter([
         />
       ),
     },
-    {
-      path: 'profile',
-      element: (
-        <DashboardSectionPage
-          eyebrow="HASTA PANELİ"
-          title="Profilim"
-          description="Hesap ve profil bilgilerinizi bu alandan yönetebileceksiniz."
-        />
-      ),
-    },
+ {
+  path: 'profile',
+  element: <PatientProfilePage />,
+},
   ],
 },
 
@@ -153,16 +144,22 @@ const router = createBrowserRouter([
   path: 'appointments',
   element: <DoctorAppointmentsPage />,
 },
-    {
-      path: 'patients',
-      element: (
-        <DashboardSectionPage
-          eyebrow="DOKTOR PANELİ"
-          title="Hastalar"
-          description="Size bağlı hasta kayıtları ve klinik süreçler bu alanda görüntülenecek."
-        />
-      ),
-    },
+
+{
+  path: 'patients',
+  element: (
+    <DashboardSectionPage
+      eyebrow="DOKTOR PANELİ"
+      title="Hastalar"
+      description="Size bağlı hasta kayıtları ve klinik süreçler bu alanda görüntülenecek."
+    />
+  ),
+},
+
+{
+  path: 'invoices',
+  element: <DoctorInvoicesPage />,
+},
     {
       path: 'messages',
       element: (

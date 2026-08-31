@@ -97,6 +97,11 @@ const roleNavigation = {
       icon: UsersRound,
     },
     {
+  label: 'Faturalar',
+  to: '/doctor/invoices',
+  icon: FileText,
+},
+    {
       label: 'Mesajlar',
       to: '/doctor/messages',
       icon: MessageCircle,
@@ -223,7 +228,7 @@ export default function DashboardLayout() {
   role={user?.role}
 />
 
-        <div className="flex-1 overflow-y-auto px-4 py-6">
+        <div className="flex-1 overflow-y-auto px-4 py-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
          <div className="flex items-center justify-between px-3">
   <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/35">
     MENÜ
@@ -386,7 +391,7 @@ export default function DashboardLayout() {
                 </button>
               </div>
 
-              <nav className="flex-1 space-y-1 overflow-y-auto p-4">
+              <nav className="flex-1 space-y-1 overflow-y-auto p-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 {navigation.map(
                   ({
                     label,

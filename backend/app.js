@@ -15,6 +15,9 @@ import doctorRoutes from './routes/doctorRoutes.js'
 import doctorAvailabilityRoutes from './routes/doctorAvailabilityRoutes.js'
 import appointmentRoutes from './routes/appointmentRoutes.js'
 import treatmentRoutes from './routes/treatmentRoutes.js'
+import invoiceRoutes from './routes/invoiceRoutes.js'
+import patientRoutes from './routes/patientRoutes.js'
+import paymentRoutes from './routes/paymentRoutes.js'
 const app = express()
 
 app.disable('x-powered-by')
@@ -54,6 +57,9 @@ app.use(
 app.use('/api/appointments', appointmentRoutes)
 
 app.use('/api/treatments', treatmentRoutes)
+app.use('/api/invoices', invoiceRoutes)
+app.use('/api/patient', patientRoutes)
+app.use('/api/payments', paymentRoutes)
 app.use(notFound)
 app.use(errorHandler)
 

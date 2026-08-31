@@ -32,7 +32,12 @@ const patientProfileSchema = new mongoose.Schema(
       maxlength: 20,
       default: null,
     },
-
+address: {
+  type: String,
+  trim: true,
+  maxlength: 400,
+  default: null,
+},
     dateOfBirth: {
       type: Date,
       default: null,

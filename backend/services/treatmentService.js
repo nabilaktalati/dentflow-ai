@@ -3,7 +3,7 @@ import DoctorProfile from "../models/DoctorProfile.js";
 import TreatmentRecord from "../models/TreatmentRecord.js";
 import PatientProfile from "../models/PatientProfile.js";
 import { APPOINTMENT_STATUSES } from "../constants/appointment.js";
-
+import Invoice from "../models/Invoice.js";
 const createTreatmentError = (message, statusCode, code) => {
   const error = new Error(message);
 
@@ -174,9 +174,36 @@ export const getPatientTreatmentRecords = async ({ patientUserId }) => {
       visitDate: -1,
     })
     .lean();
+const invoices =
+  await Invoice.find({
+    treatmentRecord: {
+      $in:
+        records.map(
+          (record) =>
+            record._id,
+        ),
+    },
 
+    status: {
+      $ne: 'CANCELLED',
+    },
+  })
+    .select(
+      'treatmentRecord',
+    )
+    .lean()
+
+
+const invoicedTreatmentIds =
+  new Set(
+    invoices.map(
+      (invoice) =>
+        invoice.treatmentRecord.toString(),
+    ),
+  )
   return records.map((record) => ({
     id: record._id,
+    
     patient: {
       id: patientProfile._id,
 
@@ -201,19 +228,7 @@ export const getPatientTreatmentRecords = async ({ patientUserId }) => {
     status: record.status,
 
     nextVisitDate: record.nextVisitDate,
-    patient: {
-      id: patientProfile._id,
-
-      firstName: patientProfile.firstName,
-
-      lastName: patientProfile.lastName,
-
-      name: `${patientProfile.firstName} ${patientProfile.lastName}`,
-
-      phone: patientProfile.phone,
-
-      dateOfBirth: patientProfile.dateOfBirth,
-    },
+    
     doctor: record.doctor
       ? {
           id: record.doctor._id,
@@ -251,3 +266,172 @@ export const getPatientTreatmentRecords = async ({ patientUserId }) => {
     updatedAt: record.updatedAt,
   }));
 };
+export const getDoctorTreatmentRecords =
+  async ({
+    doctorUserId,
+  }) => {
+    const doctorProfile =
+      await DoctorProfile.findOne({
+        user: doctorUserId,
+        isActive: true,
+      })
+        .select(
+          '_id firstName lastName title clinicName',
+        )
+        .lean()
+
+    if (!doctorProfile) {
+      throw createTreatmentError(
+        'Doktor profili bulunamadı.',
+        404,
+        'DOCTOR_PROFILE_NOT_FOUND',
+      )
+    }
+
+
+    const records =
+      await TreatmentRecord.find({
+        doctor:
+          doctorProfile._id,
+      })
+        .populate({
+          path: 'patient',
+
+          select:
+            'firstName lastName phone dateOfBirth',
+        })
+        .populate({
+          path: 'appointment',
+
+          select:
+            'appointmentCode startAt endAt status',
+        })
+        .sort({
+          visitDate: -1,
+        })
+        .lean()
+const invoices =
+  await Invoice.find({
+    treatmentRecord: {
+      $in:
+        records.map(
+          (record) =>
+            record._id,
+        ),
+    },
+
+    status: {
+      $ne: 'CANCELLED',
+    },
+  })
+    .select(
+      'treatmentRecord',
+    )
+    .lean()
+
+
+const invoicedTreatmentIds =
+  new Set(
+    invoices.map(
+      (invoice) =>
+        invoice.treatmentRecord.toString(),
+    ),
+  )
+
+    return records.map(
+      (record) => ({
+        id:
+          record._id,
+hasInvoice:
+  invoicedTreatmentIds.has(
+    record._id.toString(),
+  ),
+        patient:
+          record.patient
+            ? {
+                id:
+                  record.patient._id,
+
+                firstName:
+                  record.patient.firstName,
+
+                lastName:
+                  record.patient.lastName,
+
+                name:
+                  `${record.patient.firstName} ${record.patient.lastName}`,
+
+                phone:
+                  record.patient.phone,
+
+                dateOfBirth:
+                  record.patient.dateOfBirth,
+              }
+            : null,
+
+        doctor: {
+          id:
+            doctorProfile._id,
+
+          firstName:
+            doctorProfile.firstName,
+
+          lastName:
+            doctorProfile.lastName,
+
+          name:
+            `${doctorProfile.firstName} ${doctorProfile.lastName}`,
+
+          title:
+            doctorProfile.title,
+
+          clinicName:
+            doctorProfile.clinicName,
+        },
+
+        appointment:
+          record.appointment
+            ? {
+                id:
+                  record.appointment._id,
+
+                appointmentCode:
+                  record.appointment.appointmentCode,
+
+                startAt:
+                  record.appointment.startAt,
+
+                endAt:
+                  record.appointment.endAt,
+
+                status:
+                  record.appointment.status,
+              }
+            : null,
+
+        visitDate:
+          record.visitDate,
+
+        diagnosis:
+          record.diagnosis,
+
+        treatmentPlan:
+          record.treatmentPlan,
+
+        doctorNotes:
+          record.doctorNotes,
+
+        status:
+          record.status,
+
+        nextVisitDate:
+          record.nextVisitDate,
+
+        createdAt:
+          record.createdAt,
+
+        updatedAt:
+          record.updatedAt,
+      }),
+    )
+  }

@@ -1,10 +1,9 @@
 import { Router } from 'express'
 
 import {
-  createTreatmentRecord,
-  getDoctorTreatments,
-  getMyTreatmentRecords,
-} from '../controllers/treatmentController.js'
+  createInvoice,
+  getMyInvoices,
+} from '../controllers/invoiceController.js'
 
 import {
   authenticate,
@@ -18,31 +17,21 @@ import {
 
 const router = Router()
 
-
 router.get(
   '/my',
   authenticate,
   authorizeRoles(
     USER_ROLES.PATIENT,
   ),
-  getMyTreatmentRecords,
+  getMyInvoices,
 )
-router.get(
-  '/doctor/my',
-  authenticate,
-  authorizeRoles(
-    USER_ROLES.DOCTOR,
-  ),
-  getDoctorTreatments,
-)
-
 router.post(
   '/',
   authenticate,
   authorizeRoles(
     USER_ROLES.DOCTOR,
   ),
-  createTreatmentRecord,
+  createInvoice,
 )
 
 

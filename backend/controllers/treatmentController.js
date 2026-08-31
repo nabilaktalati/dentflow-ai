@@ -6,6 +6,7 @@ import {
 
 import {
   createDoctorTreatmentRecord,
+  getDoctorTreatmentRecords,
   getPatientTreatmentRecords,
 } from '../services/treatmentService.js'
 
@@ -194,6 +195,37 @@ export const createTreatmentRecord =
       const records =
         await getPatientTreatmentRecords({
           patientUserId:
+            req.auth.userId,
+        })
+
+      return res
+        .status(200)
+        .json({
+          success: true,
+
+          data: {
+            treatments:
+              records,
+          },
+        })
+    } catch (error) {
+      return handleTreatmentError(
+        error,
+        res,
+        next,
+      )
+    }
+  }
+  export const getDoctorTreatments =
+  async (
+    req,
+    res,
+    next,
+  ) => {
+    try {
+      const records =
+        await getDoctorTreatmentRecords({
+          doctorUserId:
             req.auth.userId,
         })
 
