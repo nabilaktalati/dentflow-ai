@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 import Appointment from '../models/Appointment.js'
 import DoctorProfile from '../models/DoctorProfile.js'
 import PatientProfile from '../models/PatientProfile.js'
-
+import TreatmentRecord from '../models/TreatmentRecord.js'
 import {
   createAppointmentSchema,
   cancelAppointmentSchema,
@@ -326,27 +326,52 @@ export const getDoctorAppointments =
       }
 
       const appointments =
-        await Appointment.find({
-          doctor:
-            doctorProfile._id,
-        })
-          .populate({
-            path: 'patient',
+  await Appointment.find({
+    doctor:
+      doctorProfile._id,
+  })
+    .populate({
+      path: 'patient',
 
-            select:
-              'firstName lastName phone',
-          })
-          .sort({
-            startAt: 1,
-          })
-          .lean()
+      select:
+        'firstName lastName phone',
+    })
+    .sort({
+      startAt: 1,
+    })
+    .lean()
 
+
+const treatmentRecords =
+  await TreatmentRecord.find({
+    appointment: {
+      $in:
+        appointments.map(
+          (appointment) =>
+            appointment._id,
+        ),
+    },
+  })
+    .select('appointment')
+    .lean()
+
+
+const treatmentAppointmentIds =
+  new Set(
+    treatmentRecords.map(
+      (record) =>
+        record.appointment.toString(),
+    ),
+  )
       const formattedAppointments =
         appointments.map(
           (appointment) => ({
             id:
               appointment._id.toString(),
-
+hasTreatmentRecord:
+  treatmentAppointmentIds.has(
+    appointment._id.toString(),
+  ),
             appointmentCode:
               appointment.appointmentCode,
 

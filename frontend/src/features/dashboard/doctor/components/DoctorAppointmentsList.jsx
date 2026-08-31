@@ -1,5 +1,6 @@
 import {
   CalendarDays,
+  CheckCircle2,
   Clock3,
   FileText,
   Phone,
@@ -15,7 +16,7 @@ import {
 import {
   getDoctorAppointments,
 } from '../api/doctorAppointmentsApi.js'
-
+import DoctorTreatmentForm from './DoctorTreatmentForm.jsx'
 
 const statusConfig = {
   PENDING: {
@@ -90,6 +91,11 @@ const DoctorAppointmentsList =
       error,
       setError,
     ] = useState('')
+
+const [
+  selectedAppointment,
+  setSelectedAppointment,
+] = useState(null)
 
 
     useEffect(() => {
@@ -297,17 +303,43 @@ const DoctorAppointmentsList =
                         </div>
 
 
-                        <div className="rounded-[18px] border border-[#E8E8F2] bg-[#FAFAFD] px-5 py-4 lg:min-w-[190px]">
-                          <div className="text-[9px] font-bold uppercase tracking-[0.19em] text-[#9BA1B4]">
-                            RANDEVU KODU
-                          </div>
+                        <div className="space-y-3 lg:min-w-[190px]">
+  <div className="rounded-[18px] border border-[#E8E8F2] bg-[#FAFAFD] px-5 py-4">
+    <div className="text-[9px] font-bold uppercase tracking-[0.19em] text-[#9BA1B4]">
+      RANDEVU KODU
+    </div>
 
-                          <div className="mt-2 font-mono text-[14px] font-bold tracking-[0.08em] text-[#5653E8]">
-                            {
-                              appointment.appointmentCode
-                            }
-                          </div>
-                        </div>
+    <div className="mt-2 font-mono text-[14px] font-bold tracking-[0.08em] text-[#5653E8]">
+      {appointment.appointmentCode}
+    </div>
+  </div>
+
+ {appointment.hasTreatmentRecord ? (
+  <div className="flex h-10 w-full items-center justify-center gap-2 rounded-[13px] border border-emerald-200 bg-emerald-50 px-4 text-[11px] font-bold text-emerald-700">
+    <CheckCircle2
+      size={15}
+      strokeWidth={2}
+    />
+
+    Tedavi Kaydı Mevcut
+  </div>
+) : (
+  appointment.status !==
+    'CANCELLED' && (
+    <button
+      type="button"
+      onClick={() =>
+        setSelectedAppointment(
+          appointment,
+        )
+      }
+      className="h-10 w-full rounded-[13px] border border-[#DCDDFE] bg-[#F5F4FF] px-4 text-[11px] font-bold text-[#5D59E8] transition hover:border-[#C8C8FA] hover:bg-[#EFEEFF]"
+    >
+      Tedavi Kaydı Oluştur
+    </button>
+  )
+)}
+</div>
                       </div>
 
 
@@ -335,6 +367,42 @@ const DoctorAppointmentsList =
                         </>
                       )}
                     </div>
+
+                    {selectedAppointment?.id ===
+  appointment.id && (
+  <div className="border-t border-[#EEEFF5] bg-[#FAFAFD] p-5 sm:p-6">
+    <DoctorTreatmentForm
+      appointment={
+        appointment
+      }
+      onCancel={() =>
+        setSelectedAppointment(
+          null,
+        )
+      }
+      onSuccess={() => {
+  setAppointments(
+    (current) =>
+      current.map(
+        (item) =>
+          item.id ===
+          appointment.id
+            ? {
+                ...item,
+                hasTreatmentRecord:
+                  true,
+              }
+            : item,
+      ),
+  )
+
+  setSelectedAppointment(
+    null,
+  )
+}}
+    />
+  </div>
+)}
                   </article>
                 )
               },

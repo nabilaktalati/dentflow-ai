@@ -23,6 +23,7 @@ import ChangePasswordPage from '../features/auth/pages/ChangePasswordPage.jsx'
 import DoctorAppointmentsPage from '../features/dashboard/doctor/pages/DoctorAppointmentsPage.jsx'
 import PatientAppointmentsPage from '../features/dashboard/patient/pages/PatientAppointmentsPage.jsx'
 import PatientBookingPage from '../features/dashboard/patient/pages/PatientBookingPage.jsx'
+import PatientTreatmentsPage from '../features/dashboard/patient/pages/PatientTreatmentsPage.jsx'
 const router = createBrowserRouter([
   // PUBLIC WEBSITE
   {
@@ -98,15 +99,9 @@ const router = createBrowserRouter([
   element: <PatientBookingPage />,
 },
     {
-      path: 'treatments',
-      element: (
-        <DashboardSectionPage
-          eyebrow="HASTA PANELİ"
-          title="Tedavi Sürecim"
-          description="Tedavi planınız ve klinik süreciniz bu alanda görüntülenecek."
-        />
-      ),
-    },
+  path: 'treatments',
+  element: <PatientTreatmentsPage />,
+},
     {
       path: 'invoices',
       element: (
