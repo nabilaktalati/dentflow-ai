@@ -1,10 +1,12 @@
 import {
+  useEffect,
   useState,
 } from 'react'
 
 import {
   NavLink,
   Outlet,
+  useLocation,
   useNavigate,
 } from 'react-router'
 import BrandLogo from '../../../components/ui/BrandLogo.jsx'
@@ -21,6 +23,7 @@ import {
   Stethoscope,
   UserRound,
   UsersRound,
+  Bell,
   X,
 } from 'lucide-react'
 
@@ -33,6 +36,15 @@ import {
   useAuth,
 } from '../../auth/context/authContext.js'
 
+import {
+  getUnreadMessageCount,
+} from '../shared/api/messagesApi.js'
+
+import {
+  getUnreadNotificationCount,
+} from '../shared/api/notificationsApi.js'
+
+import NotificationDropdown from '../shared/components/NotificationDropdown.jsx'
 
 const roleNavigation = {
   PATIENT: [
@@ -158,7 +170,7 @@ const roleLabel = {
 
 export default function DashboardLayout() {
   const navigate = useNavigate()
-
+const location = useLocation()
   const {
     user,
     logout,
@@ -169,11 +181,109 @@ export default function DashboardLayout() {
     setMobileOpen,
   ] = useState(false)
 
+const [
+  unreadMessageCount,
+  setUnreadMessageCount,
+] = useState(0)
+
+
+const [
+  unreadNotificationCount,
+  setUnreadNotificationCount,
+] = useState(0)
+
+const [
+  notificationOpen,
+  setNotificationOpen,
+] = useState(false)
+
 
   const navigation =
     roleNavigation[user?.role] || []
 
+useEffect(() => {
+  if (
+    user?.role !== 'PATIENT' &&
+    user?.role !== 'DOCTOR'
+  ) {
+    
+    return undefined
+  }
 
+  let active = true
+
+  const loadUnreadCount = async () => {
+    try {
+      const count =
+        await getUnreadMessageCount()
+
+      if (active) {
+        setUnreadMessageCount(
+          count,
+        )
+      }
+    } catch {
+      if (active) {
+        setUnreadMessageCount(0)
+      }
+    }
+  }
+
+  const timeoutId = setTimeout(
+    loadUnreadCount,
+    location.pathname.includes(
+      '/messages',
+    )
+      ? 500
+      : 0,
+  )
+
+  const intervalId = setInterval(
+    loadUnreadCount,
+    10000,
+  )
+
+  return () => {
+    active = false
+    clearTimeout(timeoutId)
+    clearInterval(intervalId)
+  }
+}, [user?.role, location.pathname])
+useEffect(() => {
+  if (!user) return undefined
+
+  let active = true
+
+  const loadNotificationCount =
+    async () => {
+      try {
+        const count =
+          await getUnreadNotificationCount()
+
+        if (active) {
+          setUnreadNotificationCount(
+            count,
+          )
+        }
+      } catch {
+        if (active) {
+          setUnreadNotificationCount(0)
+        }
+      }
+    }
+
+  loadNotificationCount()
+
+  const intervalId = setInterval(
+    loadNotificationCount,
+    10000,
+  )
+
+  return () => {
+    active = false
+    clearInterval(intervalId)
+  }
+}, [user])
   const handleLogout = async () => {
     await logout()
 
@@ -294,9 +404,18 @@ export default function DashboardLayout() {
     />
   </span>
 
-  <span className="truncate">
-    {label}
-  </span>
+<span className="min-w-0 flex-1 truncate">
+  {label}
+</span>
+
+{label === 'Mesajlar' &&
+  unreadMessageCount > 0 && (
+    <span className="ml-auto flex h-[20px] min-w-[20px] items-center justify-center rounded-full bg-[#7168FF] px-1.5 text-[9px] font-bold text-white shadow-[0_0_14px_rgba(113,104,255,0.35)]">
+      {unreadMessageCount > 9
+        ? '9+'
+        : unreadMessageCount}
+    </span>
+  )}
 </>
                   )}
                 </NavLink>
@@ -478,7 +597,45 @@ export default function DashboardLayout() {
 </p>
           </div>
 
+
           <div className="ml-auto flex items-center gap-3">
+<div className="relative">
+  <button
+    type="button"
+    aria-label="Bildirimler"
+    onClick={() =>
+      setNotificationOpen(
+        (current) => !current,
+      )
+    }
+    className="relative grid size-10 place-items-center rounded-xl border border-[#E4E7EC] bg-white text-[#667085] transition hover:bg-[#F9FAFB] hover:text-[#5B52F2]"
+  >
+    <Bell
+      size={18}
+      strokeWidth={1.9}
+    />
+
+    {unreadNotificationCount > 0 && (
+      <span className="absolute -right-1 -top-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-[#7168FF] px-1 text-[9px] font-bold text-white">
+        {unreadNotificationCount > 9
+          ? '9+'
+          : unreadNotificationCount}
+      </span>
+    )}
+  </button>
+
+  {notificationOpen && (
+    <NotificationDropdown
+      onClose={() =>
+        setNotificationOpen(false)
+      }
+      onUnreadCountChange={
+        setUnreadNotificationCount
+      }
+    />
+  )}
+</div>
+
             <button
               type="button"
               onClick={() =>

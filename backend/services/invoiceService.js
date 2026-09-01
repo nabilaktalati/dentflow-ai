@@ -5,6 +5,10 @@ import Invoice from '../models/Invoice.js'
 import PatientProfile from '../models/PatientProfile.js'
 import TreatmentRecord from '../models/TreatmentRecord.js'
 
+import {
+  createNotification,
+} from './notificationService.js'
+
 
 const createInvoiceError = (
   message,
@@ -203,7 +207,34 @@ if (dueDate) {
           'NOT_SENT',
       })
 
+try {
+  const patientProfile =
+    await PatientProfile.findById(
+      treatmentRecord.patient,
+    )
+      .select('user')
+      .lean()
 
+  if (patientProfile?.user) {
+    await createNotification({
+      recipientId:
+        patientProfile.user,
+      type: 'INVOICE',
+      title: 'Yeni fatura',
+      message:
+        'Yeni faturanız oluşturuldu.',
+      actionPath:
+        '/patient/invoices',
+      relatedEntityId:
+        invoice._id,
+    })
+  }
+} catch (error) {
+  console.error(
+    'Fatura bildirimi oluşturulamadı:',
+    error.message,
+  )
+}
     return invoice
   }
 

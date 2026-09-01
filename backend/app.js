@@ -18,6 +18,8 @@ import treatmentRoutes from './routes/treatmentRoutes.js'
 import invoiceRoutes from './routes/invoiceRoutes.js'
 import patientRoutes from './routes/patientRoutes.js'
 import paymentRoutes from './routes/paymentRoutes.js'
+import messageRoutes from './routes/messageRoutes.js'
+import notificationRoutes from './routes/notificationRoutes.js'
 const app = express()
 
 app.disable('x-powered-by')
@@ -60,6 +62,11 @@ app.use('/api/treatments', treatmentRoutes)
 app.use('/api/invoices', invoiceRoutes)
 app.use('/api/patient', patientRoutes)
 app.use('/api/payments', paymentRoutes)
+app.use('/api/messages', messageRoutes)
+app.use(
+  '/api/notifications',
+  notificationRoutes,
+)
 app.use(notFound)
 app.use(errorHandler)
 

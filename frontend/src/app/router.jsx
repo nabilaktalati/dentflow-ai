@@ -27,6 +27,7 @@ import PatientTreatmentsPage from '../features/dashboard/patient/pages/PatientTr
 import DoctorInvoicesPage from '../features/dashboard/doctor/pages/DoctorInvoicesPage.jsx'
 import PatientInvoicesPage from '../features/dashboard/patient/pages/PatientInvoicesPage.jsx'
 import PatientProfilePage from '../features/dashboard/patient/pages/PatientProfilePage.jsx'
+import MessagesPage from '../features/dashboard/shared/pages/MessagesPage.jsx'
 const router = createBrowserRouter([
   // PUBLIC WEBSITE
   {
@@ -110,15 +111,9 @@ const router = createBrowserRouter([
   element: <PatientInvoicesPage />,
 },
     {
-      path: 'messages',
-      element: (
-        <DashboardSectionPage
-          eyebrow="HASTA PANELİ"
-          title="Mesajlar"
-          description="Klinik ekibiyle güvenli iletişiminizi bu alandan yöneteceksiniz."
-        />
-      ),
-    },
+  path: 'messages',
+  element: <MessagesPage />,
+},
  {
   path: 'profile',
   element: <PatientProfilePage />,
@@ -161,15 +156,9 @@ const router = createBrowserRouter([
   element: <DoctorInvoicesPage />,
 },
     {
-      path: 'messages',
-      element: (
-        <DashboardSectionPage
-          eyebrow="DOKTOR PANELİ"
-          title="Mesajlar"
-          description="Hasta ve klinik ekibiyle güvenli iletişiminizi bu alandan yöneteceksiniz."
-        />
-      ),
-    },
+  path: 'messages',
+  element: <MessagesPage />,
+},
     {
       path: 'profile',
       element: (
