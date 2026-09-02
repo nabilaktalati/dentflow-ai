@@ -698,12 +698,12 @@ const handleMessageConfirm = async (assistantMessage) => {
                                   {item.content}
                                 </p>
 
-                                {!isUser &&
-                                  item.action ===
-                                    "CHECK_APPOINTMENT_AVAILABILITY" &&
-                                  item.parameters?.doctorProfileId &&
-                                  item.parameters?.date &&
-                                  item.parameters?.time && (
+                               {!isUser &&
+  item.action === "CHECK_APPOINTMENT_AVAILABILITY" &&
+  item.data?.status === "AVAILABLE" &&
+  item.parameters?.doctorProfileId &&
+  item.parameters?.date &&
+  item.parameters?.time && (
                                     <div
                                       className={
                                         screenshotMode ? "mt-2" : "mt-3"
