@@ -78,9 +78,7 @@ const router = createBrowserRouter([
 
 
 
-   // ROLE-BASED DASHBOARDS
-
- {
+  {
   path: '/patient',
   element: (
     <ProtectedRoute>
@@ -99,25 +97,26 @@ const router = createBrowserRouter([
       element: <PatientAppointmentsPage />,
     },
     {
-  path: 'book',
-  element: <PatientBookingPage />,
-},
+      path: 'book',
+      element: <PatientBookingPage />,
+    },
     {
-  path: 'treatments',
-  element: <PatientTreatmentsPage />,
-},
+      path: 'treatments',
+      element: <PatientTreatmentsPage />,
+    },
     {
-  path: 'invoices',
-  element: <PatientInvoicesPage />,
-},
+      path: 'invoices',
+      element: <PatientInvoicesPage />,
+    },
     {
-  path: 'messages',
-  element: <MessagesPage />,
-},
- {
-  path: 'profile',
-  element: <PatientProfilePage />,
-},
+      path: 'messages',
+      element: <MessagesPage />,
+    },
+
+    {
+      path: 'profile',
+      element: <PatientProfilePage />,
+    },
   ],
 },
 

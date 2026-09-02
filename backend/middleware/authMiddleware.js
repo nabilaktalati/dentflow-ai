@@ -107,6 +107,74 @@ export const authenticate = async (
     next(error)
   }
 }
+
+export const authenticateOptional = async (
+  req,
+  res,
+  next,
+) => {
+  try {
+    const accessToken =
+      getAccessTokenFromCookies(req)
+
+    // Ziyaretçi kullanıcı
+    if (!accessToken) {
+      req.auth = null
+      return next()
+    }
+
+    let payload
+
+    try {
+      payload =
+        verifyAccessToken(accessToken)
+    } catch {
+      req.auth = null
+      return next()
+    }
+
+    const session =
+      await Session.findOne({
+        _id: payload.sid,
+        user: payload.sub,
+        revokedAt: null,
+      })
+
+    if (
+      !session ||
+      session.expiresAt.getTime() <=
+        Date.now()
+    ) {
+      req.auth = null
+      return next()
+    }
+
+    const user =
+      await User.findById(payload.sub)
+
+    if (
+      !user ||
+      !user.isEmailVerified ||
+      user.status !== 'ACTIVE'
+    ) {
+      req.auth = null
+      return next()
+    }
+
+    // Giriş yapmış kullanıcı
+    req.auth = {
+      userId: user._id.toString(),
+      role: user.role,
+      sessionId:
+        session._id.toString(),
+    }
+
+    return next()
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const authorizeRoles =
   (...allowedRoles) =>
   (req, res, next) => {

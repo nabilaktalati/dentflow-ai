@@ -20,6 +20,7 @@ import patientRoutes from './routes/patientRoutes.js'
 import paymentRoutes from './routes/paymentRoutes.js'
 import messageRoutes from './routes/messageRoutes.js'
 import notificationRoutes from './routes/notificationRoutes.js'
+import aiAssistantRoutes from './routes/aiAssistantRoutes.js'
 const app = express()
 
 app.disable('x-powered-by')
@@ -66,6 +67,10 @@ app.use('/api/messages', messageRoutes)
 app.use(
   '/api/notifications',
   notificationRoutes,
+)
+app.use(
+  '/api/ai-assistant',
+  aiAssistantRoutes,
 )
 app.use(notFound)
 app.use(errorHandler)

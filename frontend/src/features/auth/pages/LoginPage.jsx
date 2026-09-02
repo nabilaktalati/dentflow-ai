@@ -138,6 +138,22 @@ const handleSuccessTransition = async (role) => {
 
   await wait(1750)
 
+  const pendingAiAction =
+    sessionStorage.getItem(
+      'dentflow_pending_ai_action',
+    )
+
+  if (
+    role === 'PATIENT' &&
+    pendingAiAction
+  ) {
+    navigate('/?resumeAi=1', {
+      replace: true,
+    })
+
+    return
+  }
+
   navigate(
     getRoleRedirectPath(role),
     {
