@@ -21,6 +21,7 @@ import paymentRoutes from './routes/paymentRoutes.js'
 import messageRoutes from './routes/messageRoutes.js'
 import notificationRoutes from './routes/notificationRoutes.js'
 import aiAssistantRoutes from './routes/aiAssistantRoutes.js'
+import adminAnalyticsRoutes from './routes/adminAnalyticsRoutes.js'
 const app = express()
 
 app.disable('x-powered-by')
@@ -52,6 +53,10 @@ app.use(
 app.use(
   '/api/admin/doctors',
   adminDoctorRoutes,
+)
+app.use(
+  '/api/admin/analytics',
+  adminAnalyticsRoutes,
 )
 app.use(
   '/api/doctor/availability',
