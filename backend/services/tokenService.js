@@ -7,6 +7,16 @@ const ACCESS_TOKEN_EXPIRES_IN =
 const REFRESH_TOKEN_EXPIRES_IN =
   process.env.JWT_REFRESH_EXPIRES_IN || '7d'
 
+const OBJECT_ID_PATTERN =
+  /^[a-fA-F0-9]{24}$/
+
+const isValidObjectIdString = (
+  value,
+) =>
+  typeof value === 'string' &&
+  OBJECT_ID_PATTERN.test(value)
+
+
 const getAccessSecret = () => {
   const secret =
     process.env.JWT_ACCESS_SECRET
@@ -20,6 +30,7 @@ const getAccessSecret = () => {
   return secret
 }
 
+
 const getRefreshSecret = () => {
   const secret =
     process.env.JWT_REFRESH_SECRET
@@ -32,6 +43,7 @@ const getRefreshSecret = () => {
 
   return secret
 }
+
 
 export const signAccessToken = ({
   userId,
@@ -47,9 +59,11 @@ export const signAccessToken = ({
     getAccessSecret(),
     {
       subject: userId,
-      expiresIn: ACCESS_TOKEN_EXPIRES_IN,
+      expiresIn:
+        ACCESS_TOKEN_EXPIRES_IN,
     },
   )
+
 
 export const signRefreshToken = ({
   userId,
@@ -63,10 +77,12 @@ export const signRefreshToken = ({
     getRefreshSecret(),
     {
       subject: userId,
-      expiresIn: REFRESH_TOKEN_EXPIRES_IN,
+      expiresIn:
+        REFRESH_TOKEN_EXPIRES_IN,
       jwtid: crypto.randomUUID(),
     },
   )
+
 
 export const verifyAccessToken = (
   token,
@@ -76,14 +92,30 @@ export const verifyAccessToken = (
     getAccessSecret(),
   )
 
-  if (payload.type !== 'access') {
+  if (
+    payload.type !== 'access'
+  ) {
     throw new Error(
       'Geçersiz access token türü.',
     )
   }
 
+  if (
+    !isValidObjectIdString(
+      payload.sub,
+    ) ||
+    !isValidObjectIdString(
+      payload.sid,
+    )
+  ) {
+    throw new Error(
+      'Geçersiz access token bilgileri.',
+    )
+  }
+
   return payload
 }
+
 
 export const verifyRefreshToken = (
   token,
@@ -93,14 +125,30 @@ export const verifyRefreshToken = (
     getRefreshSecret(),
   )
 
-  if (payload.type !== 'refresh') {
+  if (
+    payload.type !== 'refresh'
+  ) {
     throw new Error(
       'Geçersiz refresh token türü.',
     )
   }
 
+  if (
+    !isValidObjectIdString(
+      payload.sub,
+    ) ||
+    !isValidObjectIdString(
+      payload.sid,
+    )
+  ) {
+    throw new Error(
+      'Geçersiz refresh token bilgileri.',
+    )
+  }
+
   return payload
 }
+
 
 export const hashRefreshToken = (
   token,
