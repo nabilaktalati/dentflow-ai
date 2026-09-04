@@ -1,4 +1,26 @@
 import {
+  useEffect,
+  useState,
+} from 'react'
+
+import {
+  getMyAppointments,
+} from '../api/patientAppointmentsApi.js'
+
+import {
+  getMyInvoices,
+} from '../api/patientInvoicesApi.js'
+
+import {
+  getMyTreatments,
+} from '../api/patientTreatmentsApi.js'
+
+import {
+  getUnreadMessageCount,
+} from '../../shared/api/messagesApi.js'
+
+
+import {
   CalendarDays,
   FileText,
   MessageCircle,
@@ -19,43 +41,114 @@ import {
 } from '../../../auth/context/authContext.js'
 
 
-const patientStats = [
-  {
-    label: 'Yaklaşan Randevu',
-    value: '—',
-    icon: CalendarDays,
-    iconClass:
-      'bg-[#EAF3FF] text-[#4A85FF]',
-  },
-  {
-    label: 'Tedavi Süreci',
-    value: '—',
-    icon: Stethoscope,
-    iconClass:
-      'bg-[#EFEAFF] text-[#6C63FF]',
-  },
-  {
-    label: 'Faturalar',
-    value: '—',
-    icon: FileText,
-    iconClass:
-      'bg-[#FFF4E8] text-[#E98A35]',
-  },
-  {
-    label: 'Mesajlar',
-    value: '—',
-    icon: MessageCircle,
-    iconClass:
-      'bg-[#EAFBF1] text-[#16A34A]',
-  },
-]
 
 
 export default function PatientDashboardPage() {
   const {
     user,
   } = useAuth()
+const [stats, setStats] =
+  useState({
+    appointments: null,
+    treatments: null,
+    invoices: null,
+    messages: null,
+  })
 
+useEffect(() => {
+  const loadStats = async () => {
+    const [
+      appointmentsResult,
+      treatmentsResult,
+      invoicesResult,
+      messagesResult,
+    ] = await Promise.allSettled([
+      getMyAppointments(),
+      getMyTreatments(),
+      getMyInvoices(),
+      getUnreadMessageCount(),
+    ])
+
+    const appointments =
+      appointmentsResult.status ===
+      'fulfilled'
+        ? appointmentsResult.value
+            ?.data?.appointments || []
+        : null
+
+    setStats({
+      appointments:
+        appointments === null
+          ? null
+          : appointments.filter(
+              (appointment) =>
+                appointment.status ===
+                  'PENDING' ||
+                appointment.status ===
+                  'CONFIRMED',
+            ).length,
+
+      treatments:
+        treatmentsResult.status ===
+        'fulfilled'
+          ? treatmentsResult.value
+              ?.data?.treatments
+              ?.length || 0
+          : null,
+
+      invoices:
+        invoicesResult.status ===
+        'fulfilled'
+          ? invoicesResult.value
+              ?.data?.invoices
+              ?.length || 0
+          : null,
+
+      messages:
+        messagesResult.status ===
+        'fulfilled'
+          ? messagesResult.value
+          : null,
+    })
+  }
+
+  loadStats()
+}, [])
+
+const patientStats = [
+  {
+    label: 'Yaklaşan Randevu',
+    value:
+      stats.appointments ?? '—',
+    icon: CalendarDays,
+    iconClass:
+      'bg-[#EAF3FF] text-[#4A85FF]',
+  },
+  {
+    label: 'Tedavi Süreci',
+    value:
+      stats.treatments ?? '—',
+    icon: Stethoscope,
+    iconClass:
+      'bg-[#EFEAFF] text-[#6C63FF]',
+  },
+  {
+    label: 'Faturalar',
+    value:
+      stats.invoices ?? '—',
+    icon: FileText,
+    iconClass:
+      'bg-[#FFF4E8] text-[#E98A35]',
+  },
+  {
+    label: 'Mesajlar',
+    value:
+      stats.messages ?? '—',
+    icon: MessageCircle,
+    iconClass:
+      'bg-[#EAFBF1] text-[#16A34A]',
+  },
+]
   const email =
     user?.email || '—'
 
