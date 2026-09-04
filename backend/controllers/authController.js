@@ -205,23 +205,29 @@ export const registerPatient = async (
       },
     )
 
-    // 8. Kayıt tamamlandıktan sonra OTP gönder
-    let verificationEmailSent = true
+// 8. OTP e-postasını arka planda gönder.
+// Kullanıcının kayıt ekranında SMTP yanıtını
+// beklemesini engeller.
+sendVerificationEmail({
+  email,
+  firstName,
+  code: otpCode,
+}).catch((emailError) => {
+  console.error(
+    'Verification email could not be sent:',
+    emailError.message,
+  )
+})
 
-    try {
-      await sendVerificationEmail({
-        email,
-        firstName,
-        code: otpCode,
-      })
-    } catch (emailError) {
-      verificationEmailSent = false
-
-      console.error(
-        'Verification email could not be sent:',
-        emailError.message,
-      )
-    }
+return res.status(201).json({
+  success: true,
+  message:
+    'Kayıt başarılı. Doğrulama kodu e-posta adresinize gönderiliyor.',
+  data: {
+    email,
+    verificationRequired: true,
+  },
+})
 
     // OTP veya passwordHash response içinde gönderilmez.
     return res.status(201).json({
