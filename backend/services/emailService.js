@@ -1,29 +1,89 @@
-import nodemailer from 'nodemailer'
+const BREVO_API_URL =
+  'https://api.brevo.com/v3'
 
-const smtpPort =
-  Number(process.env.SMTP_PORT)
+const getBrevoHeaders = () => ({
+  accept: 'application/json',
+  'content-type': 'application/json',
+  'api-key': process.env.BREVO_API_KEY,
+})
 
-const transporter =
-  nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: smtpPort,
+const getSender = () => ({
+  name:
+    process.env.BREVO_SENDER_NAME ||
+    'DentFlow AI',
+  email:
+    process.env.BREVO_SENDER_EMAIL,
+})
 
-    secure: smtpPort === 465,
-
-    requireTLS: smtpPort === 587,
-
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+const sendBrevoEmail = async ({
+  to,
+  subject,
+  textContent,
+  htmlContent,
+  replyTo,
+}) => {
+  const response = await fetch(
+    `${BREVO_API_URL}/smtp/email`,
+    {
+      method: 'POST',
+      headers: getBrevoHeaders(),
+      body: JSON.stringify({
+        sender: getSender(),
+        to: [
+          {
+            email: to,
+          },
+        ],
+        subject,
+        textContent,
+        htmlContent,
+        ...(replyTo
+          ? {
+              replyTo: {
+                email: replyTo,
+              },
+            }
+          : {}),
+      }),
+      signal: AbortSignal.timeout(10000),
     },
+  )
 
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
-  })
+  if (!response.ok) {
+    const data =
+      await response
+        .json()
+        .catch(() => ({}))
+
+    throw new Error(
+      data.message ||
+        `Brevo API error: ${response.status}`,
+    )
+  }
+
+  return response.json()
+}
 
 export async function verifyEmailConnection() {
-  await transporter.verify()
+  const response = await fetch(
+    `${BREVO_API_URL}/account`,
+    {
+      headers: {
+        accept: 'application/json',
+        'api-key':
+          process.env.BREVO_API_KEY,
+      },
+      signal: AbortSignal.timeout(10000),
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(
+      'Brevo API connection failed.',
+    )
+  }
+
+  return true
 }
 
 export async function sendContactEmail({
@@ -33,14 +93,14 @@ export async function sendContactEmail({
   subject,
   message,
 }) {
-  return transporter.sendMail({
-    from: `"DentFlow AI" <${process.env.SMTP_USER}>`,
+  return sendBrevoEmail({
     to: process.env.CONTACT_RECEIVER,
     replyTo: email,
 
-    subject: `[DentFlow İletişim] ${subject}`,
+    subject:
+      `[DentFlow İletişim] ${subject}`,
 
-    text: `
+    textContent: `
 Yeni iletişim mesajı
 
 Ad Soyad: ${fullName}
@@ -52,7 +112,7 @@ Mesaj:
 ${message}
     `,
 
-    html: `
+    htmlContent: `
       <div
         style="
           max-width: 620px;
@@ -71,21 +131,11 @@ ${message}
             padding: 28px;
           "
         >
-          <p
-            style="
-              margin: 0;
-              color: #5956f5;
-              font-size: 12px;
-              font-weight: 700;
-              letter-spacing: 1px;
-            "
-          >
+          <p style="color:#5956f5;font-weight:700;">
             DENTFLOW AI
           </p>
 
-          <h2 style="margin: 10px 0 24px;">
-            Yeni İletişim Mesajı
-          </h2>
+          <h2>Yeni İletişim Mesajı</h2>
 
           <p><strong>Ad Soyad:</strong> ${fullName}</p>
           <p><strong>E-posta:</strong> ${email}</p>
@@ -97,15 +147,14 @@ ${message}
 
           <div
             style="
-              margin-top: 24px;
-              padding: 18px;
-              background: #f8fafd;
-              border-radius: 14px;
+              margin-top:24px;
+              padding:18px;
+              background:#f8fafd;
+              border-radius:14px;
             "
           >
             <strong>Mesaj</strong>
-
-            <p style="line-height: 1.7; white-space: pre-line;">
+            <p style="line-height:1.7;">
               ${message}
             </p>
           </div>
@@ -114,18 +163,19 @@ ${message}
     `,
   })
 }
+
 export async function sendVerificationEmail({
   email,
   firstName,
   code,
 }) {
-  return transporter.sendMail({
-    from: `"DentFlow AI" <${process.env.SMTP_USER}>`,
+  return sendBrevoEmail({
     to: email,
 
-    subject: 'DentFlow AI - E-posta Doğrulama Kodu',
+    subject:
+      'DentFlow AI - E-posta Doğrulama Kodu',
 
-    text: `
+    textContent: `
 Merhaba ${firstName},
 
 DentFlow AI hesabınızı doğrulamak için aşağıdaki kodu kullanın:
@@ -134,79 +184,71 @@ ${code}
 
 Bu kod 10 dakika boyunca geçerlidir.
 
-Bu işlemi siz başlatmadıysanız bu e-postayı dikkate almayabilirsiniz.
-
 DentFlow AI
     `,
 
-    html: `
+    htmlContent: `
       <div
         style="
-          max-width: 600px;
-          margin: 0 auto;
-          padding: 32px 20px;
-          font-family: Arial, sans-serif;
-          color: #111827;
-          background: #f7f8fc;
+          max-width:600px;
+          margin:0 auto;
+          padding:32px 20px;
+          font-family:Arial,sans-serif;
+          background:#f7f8fc;
+          color:#111827;
         "
       >
         <div
           style="
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 20px;
-            padding: 32px;
+            background:#ffffff;
+            border:1px solid #e5e7eb;
+            border-radius:20px;
+            padding:32px;
           "
         >
           <p
             style="
-              margin: 0;
-              color: #5956f5;
-              font-size: 12px;
-              font-weight: 700;
-              letter-spacing: 1.4px;
+              margin:0;
+              color:#5956f5;
+              font-size:12px;
+              font-weight:700;
+              letter-spacing:1.4px;
             "
           >
             DENTFLOW AI
           </p>
 
-          <h2
-            style="
-              margin: 10px 0 12px;
-              font-size: 24px;
-              color: #111827;
-            "
-          >
+          <h2 style="margin:10px 0 12px;">
             E-posta Adresinizi Doğrulayın
           </h2>
 
           <p
             style="
-              margin: 0;
-              color: #6b7280;
-              line-height: 1.7;
+              color:#6b7280;
+              line-height:1.7;
             "
           >
-            Merhaba ${firstName}, DentFlow AI hesabınızı
-            etkinleştirmek için aşağıdaki doğrulama kodunu kullanın.
+            Merhaba ${firstName}, hesabınızı
+            etkinleştirmek için aşağıdaki
+            doğrulama kodunu kullanın.
           </p>
 
           <div
             style="
-              margin: 28px 0;
-              padding: 22px;
-              text-align: center;
-              background: #f4f3ff;
-              border: 1px solid #dddafe;
-              border-radius: 16px;
+              margin:28px 0;
+              padding:22px;
+              text-align:center;
+              background:#f4f3ff;
+              border:1px solid #dddafe;
+              border-radius:16px;
             "
           >
             <span
               style="
-                font-size: 34px;
-                font-weight: 800;
-                letter-spacing: 8px;
-                color: #4f46e5;
+                font-size:34px;
+                font-weight:800;
+                letter-spacing:8px;
+                color:#4f46e5;
               "
             >
               ${code}
@@ -215,35 +257,13 @@ DentFlow AI
 
           <p
             style="
-              margin: 0;
-              color: #6b7280;
-              font-size: 14px;
-              line-height: 1.7;
+              color:#6b7280;
+              font-size:14px;
             "
           >
-            Bu doğrulama kodu
-            <strong>10 dakika</strong>
+            Bu kod <strong>10 dakika</strong>
             boyunca geçerlidir.
           </p>
-
-          <div
-            style="
-              margin-top: 28px;
-              padding-top: 20px;
-              border-top: 1px solid #e5e7eb;
-            "
-          >
-            <p
-              style="
-                margin: 0;
-                color: #9ca3af;
-                font-size: 12px;
-                line-height: 1.6;
-              "
-            >
-              Bu işlemi siz başlatmadıysanız bu e-postayı dikkate almayabilirsiniz.
-            </p>
-          </div>
         </div>
       </div>
     `,
