@@ -295,7 +295,7 @@ const handleVerifiedTransition = () => {
   }, 1600)
 }
 return (
-  <main className="min-h-[100dvh] bg-[#f7f8fc] pt-20">
+  <main className="min-h-[100dvh] bg-[#f7f8fc] pt-32 sm:pt-28 xl:pt-20">
     <div className="mx-auto flex min-h-[calc(100dvh-5rem)] w-full max-w-[1440px] items-center justify-center px-4 py-4 sm:px-6 lg:px-8">
 
       {/* =========================

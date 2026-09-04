@@ -186,7 +186,7 @@ function Hero() {
             </span>
           </div>
 
-          <h1 className="mt-7 font-display text-[clamp(2.6rem,10vw,4.5rem)] font-bold leading-[1.02] tracking-[-0.055em] text-[#111827]">
+          <h1 className="mt-7 font-display text-[clamp(2.25rem,8.5vw,3.25rem)] font-bold leading-[1.02] tracking-[-0.055em] text-[#111827] sm:text-[clamp(3rem,7vw,4rem)]">
             Klinik Yönetimi.
 
             <span className="mt-3 block text-[#5956F5]">

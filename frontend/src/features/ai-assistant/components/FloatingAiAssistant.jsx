@@ -378,7 +378,7 @@ const handleMessageConfirm = async (assistantMessage) => {
   const showIntro = !screenshotMode || messages.length === 0;
 
   return (
-    <div className="pointer-events-none fixed bottom-6 right-6 z-[120]">
+   <div className="pointer-events-none fixed bottom-4 right-4 z-[120] sm:bottom-6 sm:right-6">
       <AnimatePresence>
         {open && (
           <motion.div
@@ -1308,7 +1308,7 @@ const handleMessageConfirm = async (assistantMessage) => {
             scale: 0.94,
           }}
           aria-label="DentFlow AI Assistant"
-          className="pointer-events-auto relative grid h-[64px] w-[64px] place-items-center rounded-full bg-gradient-to-br from-violet-600 via-indigo-600 to-blue-600 text-white shadow-[0_16px_42px_rgba(79,70,229,0.38)]"
+          className="pointer-events-auto relative grid h-[56px] w-[56px] place-items-center rounded-full bg-gradient-to-br from-violet-600 via-indigo-600 to-blue-600 text-white shadow-[0_16px_42px_rgba(79,70,229,0.38)] sm:h-[64px] sm:w-[64px]"
         >
           <motion.span
             animate={{

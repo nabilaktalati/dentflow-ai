@@ -69,20 +69,7 @@ if (!response.ok) {
   throw error
 }
 
-  if (!response.ok) {
-    const error = new Error(
-      data.message ||
-        'İşlem sırasında bir hata oluştu. Lütfen tekrar deneyin.',
-    )
-
-    error.status =
-      response.status
-
-    error.data =
-      data
-
-    throw error
-  }
+  
 
   return data
 }
