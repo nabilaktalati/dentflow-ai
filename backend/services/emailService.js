@@ -1,15 +1,26 @@
 import nodemailer from 'nodemailer'
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: false,
-  requireTLS: true,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-})
+const smtpPort =
+  Number(process.env.SMTP_PORT)
+
+const transporter =
+  nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: smtpPort,
+
+    secure: smtpPort === 465,
+
+    requireTLS: smtpPort === 587,
+
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
+  })
 
 export async function verifyEmailConnection() {
   await transporter.verify()

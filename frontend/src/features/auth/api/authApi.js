@@ -108,16 +108,17 @@ export const verifyEmail = (
 // ========================================
 
 export const resendVerification = (
-  payload,
+  email,
 ) =>
   request(
     '/api/auth/resend-verification',
     {
       method: 'POST',
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        email,
+      }),
     },
   )
-
 
 // ========================================
 // LOGIN
