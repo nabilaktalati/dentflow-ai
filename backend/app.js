@@ -35,7 +35,22 @@ const app = express()
 
 app.disable('x-powered-by')
 
-app.use(helmet())
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        scriptSrc: [
+          "'self'",
+          "'wasm-unsafe-eval'",
+        ],
+        connectSrc: [
+          "'self'",
+          'data:',
+        ],
+      },
+    },
+  }),
+)
 
 app.use(
   cors({
