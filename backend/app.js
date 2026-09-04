@@ -1,3 +1,7 @@
+import path from 'path'
+import {
+  fileURLToPath,
+} from 'url'
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
@@ -22,6 +26,11 @@ import messageRoutes from './routes/messageRoutes.js'
 import notificationRoutes from './routes/notificationRoutes.js'
 import aiAssistantRoutes from './routes/aiAssistantRoutes.js'
 import adminAnalyticsRoutes from './routes/adminAnalyticsRoutes.js'
+const __filename =
+  fileURLToPath(import.meta.url)
+
+const __dirname =
+  path.dirname(__filename)
 const app = express()
 
 app.disable('x-powered-by')
@@ -77,6 +86,38 @@ app.use(
   '/api/ai-assistant',
   aiAssistantRoutes,
 )
+if (
+  process.env.NODE_ENV ===
+  'production'
+) {
+  const frontendDistPath =
+    path.resolve(
+      __dirname,
+      '../frontend/dist',
+    )
+
+  app.use(
+    express.static(
+      frontendDistPath,
+    ),
+  )
+
+  app.use((req, res, next) => {
+    if (
+      req.method !== 'GET' ||
+      req.path.startsWith('/api/')
+    ) {
+      return next()
+    }
+
+    return res.sendFile(
+      path.join(
+        frontendDistPath,
+        'index.html',
+      ),
+    )
+  })
+}
 app.use(notFound)
 app.use(errorHandler)
 
